@@ -9,14 +9,14 @@ public class SquidGame extends Game {
   @Override
   public void init() {
     ScheduledStateSeries mainState = new ScheduledStateSeries(this, 1);
-    mainState.add(new PrepareGame(this));
-    mainState.add(new GreenLightRedLight(this));
-    mainState.add(new Dalgona(this));
-    mainState.add(new LightsOff(this));
-    mainState.add(new TheRope(this));
-    mainState.add(new Crystals(this));
-    mainState.add(new Squid(this));
-    mainState.add(new EndGame(this));
+    mainState.add(new PrepareGameState(this));
+    mainState.add(new GreenLightRedLightGameState(this));
+    mainState.add(new DalgonaGameState(this));
+    mainState.add(new LightsOffGameState(this));
+    mainState.add(new TheRopeGameState(this));
+    mainState.add(new CrystalsGameState(this));
+    mainState.add(new SquidGameState(this));
+    mainState.add(new EndGameState(this));
     mainState.start();
 
     registerDefaultCommands(mainState);
