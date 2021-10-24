@@ -1,0 +1,5 @@
+name: SquidGame
+main: jossc.squidgame.SquidGame
+api: 1.0.0
+version: ${project.version}
+author: Josscoder

@@ -1,0 +1,28 @@
+{
+  "name": "squidgame",
+  "version": "1.0.0",
+  "description": "node environment",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "prettier": "prettier \"**/*.java\"",
+    "prettier:check": "npm run prettier -- -l",
+    "prettier:cli": "npm run prettier -- -c",
+    "prettier:fix": "npm run prettier:cli -- --write"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Josscoder/SquidGame.git"
+  },
+  "author": "Josscoder",
+  "license": "GNU",
+  "bugs": {
+    "url": "https://github.com/Josscoder/SquidGame/issues"
+  },
+  "homepage": "https://github.com/Josscoder/SquidGame#readme",
+  "devDependencies": {
+    "prettier": "^2.2.1",
+    "prettier-plugin-java": "^1.0.1"
+  }
+}
