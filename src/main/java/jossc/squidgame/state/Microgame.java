@@ -6,6 +6,7 @@ import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import jossc.game.state.GameState;
 import jossc.squidgame.SquidGame;
+import jossc.squidgame.listener.DeathListener;
 
 public abstract class Microgame extends GameState {
 
@@ -17,14 +18,15 @@ public abstract class Microgame extends GameState {
 
   @Override
   protected void onStart() {
+    register(new DeathListener());
+
     if (!getInstructions().isEmpty()) {
+      broadcastMessage("                        ");
       broadcastMessage(
-        TextFormat.BOLD.toString() +
-        TextFormat.RED +
-        "Instructions: " +
-        TextFormat.RESET +
-        TextFormat.colorize(getInstructions())
+        TextFormat.BOLD.toString() + TextFormat.RED + "Instructions"
       );
+      broadcastMessage(TextFormat.colorize(getInstructions()));
+      broadcastMessage("                        ");
     }
 
     onGameStart();
@@ -89,6 +91,7 @@ public abstract class Microgame extends GameState {
             TextFormat.GREEN + "You have won!"
           );
           playSound(player, "random.totem");
+          broadcastMessage(player.getName() + " won the game!");
         }
       );
   }
