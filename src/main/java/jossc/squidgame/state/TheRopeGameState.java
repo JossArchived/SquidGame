@@ -18,7 +18,7 @@ public class TheRopeGameState extends Microgame {
   public void onGameStart() {}
 
   @Override
-  public void onUpdate() {}
+  public void onGameUpdate() {}
 
   @Override
   public void onGameEnd() {}

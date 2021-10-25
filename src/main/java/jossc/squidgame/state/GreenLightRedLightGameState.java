@@ -12,7 +12,7 @@ public class GreenLightRedLightGameState extends Microgame {
 
   @Override
   public String getInstructions() {
-    return "&7In this game, you will have to cross the line to win, but ... you can only walk when the &l&2light is green.&r&7 If the &l&clight is red&r&7 and you walk, you will be automatically eliminated. &6Good luck!";
+    return "&7In this game, you will have to cross the line to win, but... you can only walk when the &l&2light is green.&r&7 If the &l&clight is red&r&7 and you walk, you will be automatically eliminated. &6Good luck!";
   }
 
   @Override
@@ -37,7 +37,7 @@ public class GreenLightRedLightGameState extends Microgame {
   }
 
   @Override
-  public void onUpdate() {}
+  public void onGameUpdate() {}
 
   @Override
   public void onGameEnd() {}
