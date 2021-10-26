@@ -6,7 +6,7 @@ import java.time.Duration;
 public class CrystalsGameState extends Microgame {
 
   public CrystalsGameState(PluginBase plugin) {
-    super(plugin, Duration.ofMinutes(1));
+    super(plugin, Duration.ofMinutes(3));
   }
 
   @Override

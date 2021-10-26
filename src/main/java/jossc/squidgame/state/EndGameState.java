@@ -3,18 +3,11 @@ package jossc.squidgame.state;
 import cn.nukkit.plugin.PluginBase;
 import java.time.Duration;
 import jossc.game.state.GameState;
-import org.jetbrains.annotations.NotNull;
 
 public class EndGameState extends GameState {
 
-  public EndGameState(PluginBase plugin) {
-    super(plugin);
-  }
-
-  @NotNull
-  @Override
-  public Duration getDuration() {
-    return Duration.ZERO;
+  public EndGameState(PluginBase plugin, boolean withPlayers) {
+    super(plugin, (withPlayers ? Duration.ofSeconds(20) : Duration.ZERO));
   }
 
   @Override

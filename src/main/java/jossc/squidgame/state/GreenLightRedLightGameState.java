@@ -1,10 +1,16 @@
 package jossc.squidgame.state;
 
+import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.player.PlayerMoveEvent;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
+import java.util.ArrayList;
+import jossc.squidgame.utils.math.MathUtils;
 
 public class GreenLightRedLightGameState extends Microgame {
+
+  private boolean canWalk = true;
 
   public GreenLightRedLightGameState(PluginBase plugin) {
     super(plugin, Duration.ofMinutes(5));
@@ -12,33 +18,78 @@ public class GreenLightRedLightGameState extends Microgame {
 
   @Override
   public String getInstructions() {
-    return "&7In this game, you will have to cross the line to win, but... you can only walk when the &l&2light is green.&r&7 If the &l&clight is red&r&7 and you walk, you will be automatically eliminated. &6Good luck!";
+    return "To win you must reached the goal";
   }
 
   @Override
   public void onGameStart() {
+    singDoll();
+  }
+
+  private void singDoll() {
+    int time = MathUtils.randomNumber(2, 5);
+
+    broadcastTitle(
+      TextFormat.DARK_GREEN + "Green Light",
+      TextFormat.GREEN + "Now you can move"
+    );
+    broadcastSound("mob.ghast.moan");
+    canWalk = true;
+
     schedule(
       () -> {
         broadcastTitle(
-          TextFormat.BOLD.toString() +
-          TextFormat.GREEN +
-          "GREEN LIGHT " +
-          TextFormat.RED +
-          " RED LIGHT!",
-          TextFormat.DARK_GRAY + "Cross the line!",
-          0,
-          (int) (duration.toMillis() / 1000) * 20,
-          0
+          TextFormat.DARK_RED + "Red Light",
+          TextFormat.RED + "DO NOT MOVE"
         );
-        broadcastSound("");
+        broadcastSound("mob.blaze.hit");
+
+        schedule(
+          () -> {
+            canWalk = false;
+            int waitTime = MathUtils.randomNumber(2, 5);
+
+            schedule(this::singDoll, waitTime * 20);
+          },
+          20
+        );
       },
-      11
+      time * 20
     );
   }
 
-  @Override
-  public void onGameUpdate() {}
+  @EventHandler
+  public void onMove(PlayerMoveEvent event) {
+    if (!canWalk) {
+      lose(event.getPlayer());
+    }
+  }
 
   @Override
-  public void onGameEnd() {}
+  public void onGameUpdate() {
+    ArrayList<String> lines = new ArrayList<>();
+
+    lines.add(" ");
+    lines.add("Round winners: " + roundWinners.size());
+    lines.add("Ending in: " + duration.getSeconds());
+    lines.add("   ");
+    lines.add(
+      "State: " +
+      TextFormat.BOLD +
+      (canWalk ? TextFormat.GREEN + "MOVE ON" : "DO NOT MOVE") +
+      "!"
+    );
+    lines.add("     ");
+    lines.add(TextFormat.YELLOW + "play.ubbly.club");
+
+    getPlayers()
+      .forEach(
+        player -> scoreboard.sendLines(player, lines.toArray(new String[0]))
+      );
+  }
+
+  @Override
+  public void onGameEnd() {
+    schedule(() -> getRoundLosers().forEach(this::lose), 40);
+  }
 }

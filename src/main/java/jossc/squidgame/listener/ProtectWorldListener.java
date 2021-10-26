@@ -2,4 +2,4 @@ package jossc.squidgame.listener;
 
 import cn.nukkit.event.Listener;
 
-public class DeathListener implements Listener {}
+public class ProtectWorldListener implements Listener {}

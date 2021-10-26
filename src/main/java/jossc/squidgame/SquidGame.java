@@ -2,6 +2,7 @@ package jossc.squidgame;
 
 import jossc.game.Game;
 import jossc.game.state.ScheduledStateSeries;
+import jossc.squidgame.listener.ProtectWorldListener;
 import jossc.squidgame.state.*;
 import lombok.Getter;
 
@@ -17,6 +18,8 @@ public class SquidGame extends Game {
   public void init() {
     plugin = this;
 
+    registerListener(new ProtectWorldListener());
+
     mainState = new ScheduledStateSeries(this);
     mainState.add(new PreGameState(this, 12));
     mainState.add(new GreenLightRedLightGameState(this));
@@ -25,7 +28,6 @@ public class SquidGame extends Game {
     mainState.add(new TheRopeGameState(this));
     mainState.add(new CrystalsGameState(this));
     mainState.add(new SquidGameState(this));
-    mainState.add(new EndGameState(this));
     mainState.start();
 
     registerDefaultCommands(mainState);
