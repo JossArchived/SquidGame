@@ -1,20 +1,21 @@
-package jossc.squidgame.state;
+package jossc.squidgame.arena.state;
 
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.player.PlayerMoveEvent;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.TextFormat;
-import jossc.game.utils.math.MathUtils;
-
 import java.time.Duration;
 import java.util.ArrayList;
+import jossc.game.utils.math.MathUtils;
+import jossc.squidgame.arena.Arena;
+import jossc.squidgame.util.Util;
 
 public class GreenLightRedLightGameState extends Microgame {
 
   private boolean canWalk = true;
 
-  public GreenLightRedLightGameState(PluginBase plugin) {
-    super(plugin, Duration.ofMinutes(5));
+  public GreenLightRedLightGameState(PluginBase plugin, Arena arena) {
+    super(plugin, Duration.ofMinutes(5), arena);
   }
 
   @Override
@@ -68,25 +69,27 @@ public class GreenLightRedLightGameState extends Microgame {
 
   @Override
   public void onGameUpdate() {
-    ArrayList<String> lines = new ArrayList<>();
+    if (scoreboard != null) {
+      ArrayList<String> lines = new ArrayList<>();
 
-    lines.add(" ");
-    lines.add("Round winners: " + roundWinners.size());
-    lines.add("Ending in: " + duration.getSeconds());
-    lines.add("   ");
-    lines.add(
-      "State: " +
-      TextFormat.BOLD +
-      (canWalk ? TextFormat.GREEN + "MOVE ON" : "DO NOT MOVE") +
-      "!"
-    );
-    lines.add("     ");
-    lines.add(TextFormat.YELLOW + "play.ubbly.club");
-
-    getPlayers()
-      .forEach(
-        player -> scoreboard.sendLines(player, lines.toArray(new String[0]))
+      lines.add(" ");
+      lines.add("Round winners: " + roundWinners.size());
+      lines.add("Ending in: " + Util.formatTime((int) duration.getSeconds()));
+      lines.add("   ");
+      lines.add(
+        "State: " +
+        TextFormat.BOLD +
+        (canWalk ? TextFormat.GREEN + "MOVE ON" : "DO NOT MOVE") +
+        "!"
       );
+      lines.add("     ");
+      lines.add(TextFormat.YELLOW + "play.ubbly.club");
+
+      getPlayers()
+        .forEach(
+          player -> scoreboard.sendLines(player, lines.toArray(new String[0]))
+        );
+    }
   }
 
   @Override

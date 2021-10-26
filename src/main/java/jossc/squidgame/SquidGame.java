@@ -1,8 +1,9 @@
 package jossc.squidgame;
 
+import java.util.UUID;
 import jossc.game.Game;
-import jossc.game.state.ScheduledStateSeries;
-import jossc.squidgame.state.*;
+import jossc.squidgame.arena.Arena;
+import jossc.squidgame.listener.ProtectListener;
 import lombok.Getter;
 
 public class SquidGame extends Game {
@@ -11,22 +12,24 @@ public class SquidGame extends Game {
   private static SquidGame plugin;
 
   @Getter
-  private ScheduledStateSeries mainState;
+  private Arena arena;
 
   @Override
   public void init() {
     plugin = this;
 
-    mainState = new ScheduledStateSeries(this);
-    mainState.add(new PreGameState(this, 12));
-    mainState.add(new GreenLightRedLightGameState(this));
-    mainState.add(new DalgonaGameState(this));
-    mainState.add(new LightsOffGameState(this));
-    mainState.add(new TheRopeGameState(this));
-    mainState.add(new CrystalsGameState(this));
-    mainState.add(new SquidGameState(this));
-    mainState.start();
+    registerListener(new ProtectListener());
 
-    registerDefaultCommands(mainState);
+    String uuid = UUID.randomUUID().toString().substring(0, 5);
+    String worldName = getServer().getDefaultLevel().getName();
+
+    arena = new Arena(this, uuid, worldName, 2, 12);
+    arena.registerMicroGames();
+    arena.enable();
+  }
+
+  @Override
+  public void close() {
+    arena.disable();
   }
 }

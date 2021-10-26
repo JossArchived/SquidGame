@@ -1,31 +1,22 @@
-package jossc.squidgame.state;
+package jossc.squidgame.arena.state;
 
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.player.PlayerJoinEvent;
-import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
-import jossc.game.state.GameState;
+import jossc.squidgame.arena.Arena;
 import org.jetbrains.annotations.NotNull;
 
 public class PreGameState extends GameState {
 
-  private final int maxPlayers;
-  private final int minPlayers;
   private final int initialCountdown = 60;
   private int countdown;
 
-  public PreGameState(PluginBase plugin, int maxPlayers) {
-    this(plugin, maxPlayers, (maxPlayers / 6));
-  }
-
-  public PreGameState(PluginBase plugin, int maxPlayers, int minPlayers) {
-    super(plugin);
+  public PreGameState(PluginBase plugin, Arena arena) {
+    super(plugin, Duration.ZERO, arena);
     this.countdown = initialCountdown;
-    this.maxPlayers = maxPlayers;
-    this.minPlayers = minPlayers;
   }
 
   @NotNull
@@ -40,38 +31,23 @@ public class PreGameState extends GameState {
     plugin.getLogger().info(TextFormat.GREEN + "Now accepting players!");
   }
 
-  private boolean isFull() {
-    return neutralPlayersSize() >= maxPlayers;
-  }
-
   private boolean isAvailable() {
     return !isFull() && countdown > 15;
   }
 
+  @Override
   @EventHandler
   public void onJoin(PlayerJoinEvent event) {
     Player player = event.getPlayer();
 
     if (!isAvailable()) {
       event.setJoinMessage("");
-      player.kick(
-        TextFormat.RED + "This game is not available at this time!",
-        true
-      );
+      player.kick(TextFormat.RED + "This game is already starting!", true);
 
       return;
     }
 
-    String joinMessage =
-      "&7[&a+&7]&8 " +
-      player.getName() +
-      " &7joined the game (" +
-      neutralPlayersSize() +
-      "/" +
-      maxPlayers +
-      ").";
-
-    event.setJoinMessage(TextFormat.colorize(joinMessage));
+    super.onJoin(event);
 
     if (isFull()) {
       String fullMessage =
@@ -83,23 +59,9 @@ public class PreGameState extends GameState {
     }
   }
 
-  @EventHandler
-  public void onQuit(PlayerQuitEvent event) {
-    String message =
-      "&7[&c-&7]&8 " +
-      event.getPlayer().getName() +
-      " &7left the game (" +
-      (neutralPlayersSize() - 1) +
-      "/" +
-      maxPlayers +
-      ").";
-
-    event.setQuitMessage(TextFormat.colorize(message));
-  }
-
   @Override
   public void onUpdate() {
-    if (neutralPlayersSize() >= minPlayers) {
+    if (neutralPlayersSize() >= arena.getMinPlayers()) {
       countdown--;
       broadcastActionBar(
         TextFormat.GREEN +
@@ -115,16 +77,16 @@ public class PreGameState extends GameState {
   }
 
   @Override
-  protected void onEnd() {
-    plugin.getLogger().info(TextFormat.RED + "Players are no longer accepted!");
-  }
-
-  @Override
   public boolean isReadyToEnd() {
     return (
       super.isReadyToEnd() &&
       countdown == 0 &&
-      neutralPlayersSize() >= minPlayers
+      neutralPlayersSize() >= arena.getMinPlayers()
     );
+  }
+
+  @Override
+  protected void onEnd() {
+    plugin.getLogger().info(TextFormat.RED + "Players are no longer accepted!");
   }
 }

@@ -1,25 +1,44 @@
-package jossc.squidgame.state;
+package jossc.squidgame.arena.state;
 
 import cn.nukkit.Player;
+import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.player.PlayerJoinEvent;
+import cn.nukkit.event.player.PlayerQuitEvent;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import jossc.game.state.GameState;
 import jossc.game.utils.scoreboard.ScoreboardBuilder;
-import jossc.squidgame.SquidGame;
+import jossc.squidgame.arena.Arena;
 import jossc.squidgame.util.Util;
 
 public abstract class Microgame extends GameState {
 
   protected List<Player> roundWinners;
-  protected ScoreboardBuilder scoreboard;
+  protected ScoreboardBuilder scoreboard = new ScoreboardBuilder();
 
-  public Microgame(PluginBase plugin, Duration duration) {
-    super(plugin, duration);
+  public Microgame(PluginBase plugin) {
+    this(plugin, null);
+  }
+
+  public Microgame(PluginBase plugin, Arena arena) {
+    this(plugin, Duration.ZERO, arena);
+  }
+
+  public Microgame(PluginBase plugin, Duration duration, Arena arena) {
+    super(plugin, duration, arena);
     roundWinners = new ArrayList<>();
-    scoreboard = new ScoreboardBuilder();
+  }
+
+  @EventHandler
+  public void onJoin(PlayerJoinEvent event) {
+    Util.convertSpectator(event.getPlayer(), true);
+  }
+
+  @EventHandler
+  public void onQuit(PlayerQuitEvent event) {
+    roundWinners.remove(event.getPlayer());
   }
 
   public abstract String getInstructions();
@@ -27,13 +46,7 @@ public abstract class Microgame extends GameState {
   @Override
   protected void onStart() {
     getPlayers()
-      .forEach(
-        player ->
-          scoreboard.send(
-            player,
-            Util.SCOREBOARD_TITLE
-          )
-      );
+      .forEach(player -> scoreboard.send(player, Util.SCOREBOARD_TITLE));
 
     onGameStart();
 
@@ -68,10 +81,7 @@ public abstract class Microgame extends GameState {
   public abstract void onGameEnd();
 
   private void markAsEnd(boolean withPlayers) {
-    SquidGame
-      .getPlugin()
-      .getMainState()
-      .addNext(new EndGameState(plugin, withPlayers));
+    arena.getMainState().addNext(new EndGameState(plugin, arena, withPlayers));
     end();
   }
 
@@ -119,6 +129,8 @@ public abstract class Microgame extends GameState {
       0
     );
     playSound(player, "random.levelup", 2, 3);
+    Util.setDefaultAttributes(player);
+    roundWinners.add(player);
   }
 
   public void lose(Player player) {
@@ -130,7 +142,7 @@ public abstract class Microgame extends GameState {
       0
     );
     playSound(player, "mob.endermen.death");
-    player.setGamemode(Player.SPECTATOR);
+    Util.convertSpectator(player);
   }
 
   public void announceLastPlayerStanding() {

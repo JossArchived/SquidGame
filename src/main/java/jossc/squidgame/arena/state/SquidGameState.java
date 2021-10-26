@@ -1,12 +1,13 @@
-package jossc.squidgame.state;
+package jossc.squidgame.arena.state;
 
 import cn.nukkit.plugin.PluginBase;
 import java.time.Duration;
+import jossc.squidgame.arena.Arena;
 
 public class SquidGameState extends Microgame {
 
-  public SquidGameState(PluginBase plugin) {
-    super(plugin, Duration.ofMinutes(3));
+  public SquidGameState(PluginBase plugin, Arena arena) {
+    super(plugin, Duration.ofMinutes(3), arena);
   }
 
   @Override
