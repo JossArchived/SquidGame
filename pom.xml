@@ -106,7 +106,7 @@
         <dependency>
             <groupId>com.github.Josscoder</groupId>
             <artifactId>GameAPI</artifactId>
-            <version>1c161448a7</version>
+            <version>b3c6bc3e45</version>
         </dependency>
 
     </dependencies>

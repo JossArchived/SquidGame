@@ -2,7 +2,6 @@ package jossc.squidgame;
 
 import jossc.game.Game;
 import jossc.game.state.ScheduledStateSeries;
-import jossc.squidgame.listener.ProtectWorldListener;
 import jossc.squidgame.state.*;
 import lombok.Getter;
 
@@ -17,8 +16,6 @@ public class SquidGame extends Game {
   @Override
   public void init() {
     plugin = this;
-
-    registerListener(new ProtectWorldListener());
 
     mainState = new ScheduledStateSeries(this);
     mainState.add(new PreGameState(this, 12));

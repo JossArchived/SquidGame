@@ -7,9 +7,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import jossc.game.state.GameState;
+import jossc.game.utils.scoreboard.ScoreboardBuilder;
 import jossc.squidgame.SquidGame;
-import jossc.squidgame.utils.Util;
-import jossc.squidgame.utils.scoreboard.ScoreboardBuilder;
+import jossc.squidgame.util.Util;
 
 public abstract class Microgame extends GameState {
 

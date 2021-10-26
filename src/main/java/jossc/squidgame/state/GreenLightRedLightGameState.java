@@ -4,9 +4,10 @@ import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.player.PlayerMoveEvent;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.TextFormat;
+import jossc.game.utils.math.MathUtils;
+
 import java.time.Duration;
 import java.util.ArrayList;
-import jossc.squidgame.utils.math.MathUtils;
 
 public class GreenLightRedLightGameState extends Microgame {
 
