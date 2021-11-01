@@ -2,16 +2,15 @@ package jossc.squidgame;
 
 import cn.nukkit.Player;
 import cn.nukkit.math.Vector3;
-import jossc.game.Game;
-import jossc.game.phase.PhaseSeries;
-import jossc.game.phase.lobby.PreGamePhase;
-import jossc.game.phase.lobby.LobbyCountdownPhase;
-import jossc.game.phase.lobby.LobbyWaitingPhase;
-import lombok.Getter;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import jossc.game.Game;
+import jossc.game.phase.PhaseSeries;
+import jossc.game.phase.lobby.LobbyCountdownPhase;
+import jossc.game.phase.lobby.LobbyWaitingPhase;
+import jossc.game.phase.lobby.PreGamePhase;
+import lombok.Getter;
 
 public class SquidGame extends Game {
 
@@ -27,18 +26,26 @@ public class SquidGame extends Game {
     setDefaultGameMode(Player.ADVENTURE);
     setMaxPlayers(100);
     setWaitingLobby(getServer().getDefaultLevel().getSafeSpawn().add(0, 1));
-    setSpawns(new LinkedList<Vector3>(){{
-      add(new Vector3(0, 5, 0));
-      add(new Vector3(0, 5, 0));
-    }});
-    setTips(new ArrayList<String>(){{
-      add("Don't move when the red light shows!");
-      add("Pull hard on the rope game!");
-    }});
+    setSpawns(
+      new LinkedList<Vector3>() {
+        {
+          add(new Vector3(0, 5, 3));
+          add(new Vector3(0, 5, 0));
+        }
+      }
+    );
+    setTips(
+      new ArrayList<String>() {
+        {
+          add("Don't move when the red light shows!");
+          add("Pull hard on the rope game!");
+        }
+      }
+    );
 
     PhaseSeries phaseSeries = new PhaseSeries(this);
     phaseSeries.add(new LobbyWaitingPhase(this));
-    phaseSeries.add(new LobbyCountdownPhase(this, Duration.ofSeconds(20)));
+    phaseSeries.add(new LobbyCountdownPhase(this, Duration.ofSeconds(21)));
     phaseSeries.add(new PreGamePhase(this, 10));
     phaseSeries.start();
 
@@ -52,7 +59,7 @@ public class SquidGame extends Game {
 
   @Override
   public String getInstruction() {
-    return "Be the last one standing and earn a lot of money, do not forgive anyone ...";
+    return "The last person standing will win a lot of money. For this you have to win all the games...";
   }
 
   @Override
