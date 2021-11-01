@@ -10,6 +10,7 @@ import jossc.game.phase.PhaseSeries;
 import jossc.game.phase.lobby.LobbyCountdownPhase;
 import jossc.game.phase.lobby.LobbyWaitingPhase;
 import jossc.game.phase.lobby.PreGamePhase;
+import jossc.squidgame.phase.RedLightGreenLight;
 import lombok.Getter;
 
 public class SquidGame extends Game {
@@ -34,19 +35,12 @@ public class SquidGame extends Game {
         }
       }
     );
-    setTips(
-      new ArrayList<String>() {
-        {
-          add("Don't move when the red light shows!");
-          add("Pull hard on the rope game!");
-        }
-      }
-    );
 
     PhaseSeries phaseSeries = new PhaseSeries(this);
     phaseSeries.add(new LobbyWaitingPhase(this));
     phaseSeries.add(new LobbyCountdownPhase(this, Duration.ofSeconds(21)));
     phaseSeries.add(new PreGamePhase(this, 10));
+    phaseSeries.add(new RedLightGreenLight(this));
     phaseSeries.start();
 
     registerDefaultCommands(phaseSeries);
