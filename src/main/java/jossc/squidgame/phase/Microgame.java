@@ -162,7 +162,8 @@ public abstract class Microgame extends GamePhase {
       endGameByNotHavePlayers();
     } else {
       broadcastActionBar(
-        "&6This game ends in &l" + getRemainingDuration().getSeconds()
+        "&6This game ends in &l" +
+        game.formatTime((int) getRemainingDuration().getSeconds())
       );
       onGameUpdate();
     }

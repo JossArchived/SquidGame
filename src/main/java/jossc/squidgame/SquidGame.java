@@ -40,18 +40,9 @@ public class SquidGame extends Game {
     );
 
     Map<Integer, Vector3> pedestalList = new HashMap<>();
-    pedestalList.put(
-      1,
-      new Vector3(156, 14, 129)
-    );
-    pedestalList.put(
-      2,
-      new Vector3(156, 13, 133)
-    );
-    pedestalList.put(
-      3,
-      new Vector3(156, 12, 125)
-    );
+    pedestalList.put(1, new Vector3(156, 14, 129));
+    pedestalList.put(2, new Vector3(156, 13, 133));
+    pedestalList.put(3, new Vector3(156, 12, 125));
 
     setPedestalList(pedestalList);
 
