@@ -1,6 +1,7 @@
 package jossc.squidgame;
 
 import cn.nukkit.Player;
+import cn.nukkit.level.Level;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
 import java.time.Duration;
@@ -12,6 +13,7 @@ import jossc.game.phase.PhaseSeries;
 import jossc.game.phase.lobby.LobbyCountdownPhase;
 import jossc.game.phase.lobby.LobbyWaitingPhase;
 import jossc.game.phase.lobby.PreGamePhase;
+import jossc.squidgame.command.SoundCommand;
 import jossc.squidgame.phase.RedLightGreenLight;
 import lombok.Getter;
 
@@ -29,23 +31,36 @@ public class SquidGame extends Game {
     setDefaultGameMode(Player.ADVENTURE);
     setMaxPlayers(100);
 
-    Position testPosition = getServer()
-      .getDefaultLevel()
-      .getSafeSpawn()
-      .add(0, 1);
+    Level waitingLobbyMap = getServer().getDefaultLevel();
 
-    setWaitingLobby(testPosition);
-    setPedestalPosition(testPosition);
+    setWaitingLobby(waitingLobbyMap.getSafeSpawn().add(0, 1));
 
-    Map<Integer, Position> pedestalList = new HashMap<>();
-    pedestalList.put(1, testPosition);
+    setPedestalPosition(
+      Position.fromObject(new Vector3(147, 11, 129), waitingLobbyMap)
+    );
+
+    Map<Integer, Vector3> pedestalList = new HashMap<>();
+    pedestalList.put(
+      1,
+      new Vector3(156, 14, 129)
+    );
+    pedestalList.put(
+      2,
+      new Vector3(156, 13, 133)
+    );
+    pedestalList.put(
+      3,
+      new Vector3(156, 12, 125)
+    );
+
     setPedestalList(pedestalList);
 
     setSpawns(
       new LinkedList<Vector3>() {
         {
-          add(new Vector3(0, 5, 3));
-          add(new Vector3(0, 5, 0));
+          for (int i = 0; i <= 100; i++) {
+            add(new Vector3(113, 5, 133));
+          }
         }
       }
     );
@@ -58,6 +73,7 @@ public class SquidGame extends Game {
     phaseSeries.start();
 
     registerDefaultCommands();
+    registerCommand(new SoundCommand());
   }
 
   @Override
