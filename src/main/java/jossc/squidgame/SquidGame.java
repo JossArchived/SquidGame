@@ -7,7 +7,6 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-
 import jossc.game.Game;
 import jossc.game.phase.PhaseSeries;
 import jossc.game.phase.lobby.LobbyCountdownPhase;
@@ -30,7 +29,10 @@ public class SquidGame extends Game {
     setDefaultGameMode(Player.ADVENTURE);
     setMaxPlayers(100);
 
-    Position testPosition = getServer().getDefaultLevel().getSafeSpawn().add(0, 1);
+    Position testPosition = getServer()
+      .getDefaultLevel()
+      .getSafeSpawn()
+      .add(0, 1);
 
     setWaitingLobby(testPosition);
     setPedestalPosition(testPosition);
@@ -48,14 +50,14 @@ public class SquidGame extends Game {
       }
     );
 
-    PhaseSeries phaseSeries = new PhaseSeries(this);
+    phaseSeries = new PhaseSeries(this);
     phaseSeries.add(new LobbyWaitingPhase(this));
     phaseSeries.add(new LobbyCountdownPhase(this, Duration.ofSeconds(21)));
     phaseSeries.add(new PreGamePhase(this, 10));
     phaseSeries.add(new RedLightGreenLight(this));
     phaseSeries.start();
 
-    registerDefaultCommands(phaseSeries);
+    registerDefaultCommands();
   }
 
   @Override

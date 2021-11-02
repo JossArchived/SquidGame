@@ -3,6 +3,7 @@ package jossc.squidgame.phase;
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.player.PlayerMoveEvent;
+import cn.nukkit.item.Item;
 import java.time.Duration;
 import jossc.game.Game;
 import jossc.game.utils.math.MathUtils;
@@ -42,9 +43,26 @@ public class RedLightGreenLight extends Microgame {
   public void onMove(PlayerMoveEvent event) {
     Player player = event.getPlayer();
 
-    if (!roundWinners.contains(player) && !canWalk && !isReadyToEnd()) {
+    if (
+      !roundWinners.contains(player) &&
+      !canWalk &&
+      !isReadyToEnd() &&
+      !player.isSpectator()
+    ) {
       lose(player);
     }
+  }
+
+  private void giveWool(int meta) {
+    getNeutralPlayers()
+      .forEach(
+        player -> {
+          for (int i = 0; i <= 8; i++) {
+            player.getInventory().setItem(i, Item.get(Item.WOOL, meta));
+          }
+          game.updatePlayerInventory(player);
+        }
+      );
   }
 
   private void singDoll() {
@@ -53,6 +71,8 @@ public class RedLightGreenLight extends Microgame {
     broadcastMessage("&l&a» &r&fGreen light!");
     broadcastTitle("&aGreen Light!", "&fYou can move.");
     broadcastSound("mob.ghast.moan");
+    giveWool(5);
+
     canWalk = true;
 
     schedule(
@@ -60,6 +80,7 @@ public class RedLightGreenLight extends Microgame {
         broadcastMessage("&l&c» &r&fRed light!");
         broadcastTitle("&cRed Light!", "&fYou can not move.");
         broadcastSound("mob.blaze.hit");
+        giveWool(14);
 
         schedule(
           () -> {

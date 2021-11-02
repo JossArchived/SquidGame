@@ -6,9 +6,20 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import jossc.game.Game;
 import jossc.game.phase.GamePhase;
 import jossc.game.phase.lobby.EndGamePhase;
+import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.EventPriority;
+import cn.nukkit.event.block.BlockBreakEvent;
+import cn.nukkit.event.block.BlockBurnEvent;
+import cn.nukkit.event.block.BlockPlaceEvent;
+import cn.nukkit.event.entity.CreatureSpawnEvent;
+import cn.nukkit.event.entity.EntityDamageByBlockEvent;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.player.PlayerDropItemEvent;
+import cn.nukkit.event.player.PlayerFoodLevelChangeEvent;
 
 public abstract class Microgame extends GamePhase {
 
@@ -31,6 +42,45 @@ public abstract class Microgame extends GamePhase {
   @Override
   protected void onStart() {}
 
+  private void endGameByNotHavePlayers() {
+    game
+      .getPhaseSeries()
+      .addNext(
+        new EndGamePhase(
+          game,
+          (spectatorsSize() >= 1 ? Duration.ofSeconds(5) : Duration.ZERO),
+          null
+        )
+      );
+    end();
+  }
+
+  private void endGameByHaveTheLastPlayer() {
+    Map<Player, Integer> winners = new HashMap<>();
+
+    getNeutralPlayers()
+      .forEach(
+        player -> {
+          winners.put(player, 1);
+
+          getPlayers()
+            .forEach(
+              onlinePlayer ->
+                onlinePlayer.sendMessage(
+                  TextFormat.colorize(
+                    "&d&l» &r&7" + player.getName() + " is the winner!"
+                  )
+                )
+            );
+        }
+      );
+
+    game
+      .getPhaseSeries()
+      .addNext(new EndGamePhase(game, Duration.ofSeconds(10), winners));
+    end();
+  }
+
   @Override
   public void onUpdate() {
     countdown--;
@@ -38,7 +88,11 @@ public abstract class Microgame extends GamePhase {
     if (countdown > 0) {
       if (countdown == 10 || countdown <= 5) {
         broadcastMessage(
-          "&c&l» &r&fThis game will start in &c" + countdown + "&f seconds!"
+          "&c&l» &r&fThis game will start in &c" +
+          countdown +
+          "&f second" +
+          (countdown == 1 ? "" : "s") +
+          "!"
         );
         broadcastSound("note.bassattack", 2, 2);
       }
@@ -49,20 +103,15 @@ public abstract class Microgame extends GamePhase {
         return;
       }
 
-      schedule(() -> broadcastMessage("&7" + getName() + " &e&l» &r&f" + instruction), 11);
+      broadcastMessage("&7" + getName() + " &e&l» &r&f" + instruction);
 
-      onGameStart();
+      schedule(this::onGameStart, 20);
     }
 
     if (neutralPlayersSize() == 1) {
-      end();
-      //TODO: continue this later
-      new EndGamePhase(game, new HashMap<Player, Integer>(){{
-        getNeutralPlayers().forEach(player -> put(player, 1));
-      }}).start();
+      endGameByHaveTheLastPlayer();
     } else if (neutralPlayersSize() < 1) {
-      end();
-      game.shutdown();
+      endGameByNotHavePlayers();
     } else {
       onGameUpdate();
     }
@@ -108,5 +157,45 @@ public abstract class Microgame extends GamePhase {
 
   public void lose(Player player) {
     game.convertSpectator(player, true);
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST)
+  public void onBlockPlace(BlockPlaceEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST)
+  public void onBlockBreak(BlockBreakEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST)
+  public void onBlockBurn(BlockBurnEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST)
+  public void onEntityDamageByBlock(EntityDamageByBlockEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST)
+  public void onItemDrop(PlayerDropItemEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST)
+  public void onDamage(EntityDamageEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST)
+  public void onEntitySpawn(CreatureSpawnEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST)
+  public void onFoodLevelChange(PlayerFoodLevelChangeEvent event) {
+    event.setCancelled();
   }
 }
