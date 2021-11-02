@@ -6,6 +6,7 @@ import cn.nukkit.event.player.PlayerMoveEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import jossc.game.Game;
 import jossc.game.utils.math.MathUtils;
@@ -40,6 +41,11 @@ public class RedLightGreenLight extends Microgame {
 
   @Override
   public void onGameUpdate() {}
+
+  @Override
+  public boolean isReadyToEnd() {
+    return super.isReadyToEnd() || getRoundLosers().size() == 0;
+  }
 
   @Override
   public void onGameEnd() {
@@ -84,13 +90,13 @@ public class RedLightGreenLight extends Microgame {
   }
 
   private void giveWool(int meta) {
-    getNeutralPlayers()
+    getRoundLosers()
       .forEach(
-        player -> {
+        loser -> {
           for (int i = 0; i <= 8; i++) {
-            player.getInventory().setItem(i, Item.get(Item.WOOL, meta));
+            loser.getInventory().setItem(i, Item.get(Item.WOOL, meta));
           }
-          game.updatePlayerInventory(player);
+          game.updatePlayerInventory(loser);
         }
       );
   }
@@ -98,18 +104,34 @@ public class RedLightGreenLight extends Microgame {
   private void singDoll() {
     int time = MathUtils.nextInt(2, 5);
 
-    broadcastMessage("&l&a» &r&fGreen light!");
-    broadcastTitle("&aGreen Light!", "&fYou can move.");
-    broadcastSound("mob.ghast.moan");
+    getRoundLosers()
+      .forEach(
+        loser -> {
+          loser.sendMessage(TextFormat.colorize("&l&a» &r&fGreen light!"));
+          loser.sendTitle(
+            TextFormat.colorize("&aGreen Light!"),
+            TextFormat.WHITE + "You can move."
+          );
+          playSound(loser, "mob.ghast.moan");
+        }
+      );
     giveWool(5);
 
     canWalk = true;
 
     schedule(
       () -> {
-        broadcastMessage("&l&c» &r&fRed light!");
-        broadcastTitle("&cRed Light!", "&fYou can not move.");
-        broadcastSound("mob.blaze.hit");
+        getRoundLosers()
+          .forEach(
+            loser -> {
+              loser.sendMessage(TextFormat.colorize("&l&c» &r&fRed light!"));
+              loser.sendTitle(
+                TextFormat.colorize("&cRed Light!"),
+                TextFormat.WHITE + "You can not move."
+              );
+              playSound(loser, "mob.blaze.hit");
+            }
+          );
         giveWool(14);
 
         schedule(

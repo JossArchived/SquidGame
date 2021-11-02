@@ -196,7 +196,7 @@ public abstract class Microgame extends GamePhase {
       .forEach(
         player -> {
           if (!roundWinners.contains(player)) {
-            roundWinners.add(player);
+            losers.add(player);
           }
         }
       );
