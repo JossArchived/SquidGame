@@ -1,10 +1,13 @@
 package jossc.squidgame;
 
 import cn.nukkit.Player;
+import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
 import java.time.Duration;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
+
 import jossc.game.Game;
 import jossc.game.phase.PhaseSeries;
 import jossc.game.phase.lobby.LobbyCountdownPhase;
@@ -26,7 +29,16 @@ public class SquidGame extends Game {
     prepareMap("squidgame");
     setDefaultGameMode(Player.ADVENTURE);
     setMaxPlayers(100);
-    setWaitingLobby(getServer().getDefaultLevel().getSafeSpawn().add(0, 1));
+
+    Position testPosition = getServer().getDefaultLevel().getSafeSpawn().add(0, 1);
+
+    setWaitingLobby(testPosition);
+    setPedestalPosition(testPosition);
+
+    Map<Integer, Position> pedestalList = new HashMap<>();
+    pedestalList.put(1, testPosition);
+    setPedestalList(pedestalList);
+
     setSpawns(
       new LinkedList<Vector3>() {
         {

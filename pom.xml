@@ -102,11 +102,11 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Game API -->
+        <!-- GameAPI -->
         <dependency>
             <groupId>com.github.Josscoder</groupId>
             <artifactId>GameAPI</artifactId>
-            <version>39db83bf42</version>
+            <version>b86972ab6d</version>
         </dependency>
 
     </dependencies>

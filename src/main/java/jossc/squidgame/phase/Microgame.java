@@ -4,9 +4,11 @@ import cn.nukkit.Player;
 import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import jossc.game.Game;
 import jossc.game.phase.GamePhase;
+import jossc.game.phase.lobby.EndGamePhase;
 
 public abstract class Microgame extends GamePhase {
 
@@ -54,6 +56,10 @@ public abstract class Microgame extends GamePhase {
 
     if (neutralPlayersSize() == 1) {
       end();
+      //TODO: continue this later
+      new EndGamePhase(game, new HashMap<Player, Integer>(){{
+        getNeutralPlayers().forEach(player -> put(player, 1));
+      }}).start();
     } else if (neutralPlayersSize() < 1) {
       end();
       game.shutdown();
