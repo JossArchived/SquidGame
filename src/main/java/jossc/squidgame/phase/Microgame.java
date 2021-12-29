@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import jossc.squidgame.SquidGame;
-import jossc.squidgame.util.ParticleUtils;
 import lombok.Setter;
 import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.api.event.user.UserJoinServerEvent;
@@ -32,7 +31,6 @@ import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.phase.GamePhase;
 import net.josscoder.gameapi.user.User;
 import net.josscoder.gameapi.util.TimeUtils;
-import org.citizen.entity.Citizen;
 
 public abstract class Microgame extends GamePhase {
 
@@ -261,17 +259,6 @@ public abstract class Microgame extends GamePhase {
 
     if (map != null && teleport) {
       map.teleportToSafeSpawn(player);
-    }
-
-    if (this instanceof RedLightGreenLight) {
-      Citizen doll = ((RedLightGreenLight) this).getDoll();
-
-      if (doll != null) {
-        ParticleUtils.fireShoot(
-          doll.getPosition().add(0, 1.5),
-          player.getPosition()
-        );
-      }
     }
 
     user.convertSpectator(true, false);
