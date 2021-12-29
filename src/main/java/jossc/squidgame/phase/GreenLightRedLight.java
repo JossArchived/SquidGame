@@ -4,21 +4,32 @@ import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.player.PlayerMoveEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
+import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import java.util.function.Predicate;
+import jossc.squidgame.SquidGame;
 import jossc.squidgame.map.GreenLightRedLightMap;
+import jossc.squidgame.util.ParticleUtils;
+import lombok.NonNull;
 import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.api.event.user.PlayerRequestToLoseEvent;
 import net.josscoder.gameapi.user.User;
 import net.josscoder.gameapi.util.MathUtils;
+import org.citizen.attributes.CitizenSkin;
+import org.citizen.attributes.InvokeAttribute;
+import org.citizen.entity.Citizen;
 
 public class GreenLightRedLight extends Microgame {
 
   private boolean canWalk = true;
 
+  private Citizen doll = null;
+
   public GreenLightRedLight(Game game, Duration duration) {
     super(game, duration);
+    generateDoll();
   }
 
   @Override
@@ -33,7 +44,48 @@ public class GreenLightRedLight extends Microgame {
 
   @Override
   public void onGameStart() {
+    spawnDoll();
     singDoll();
+  }
+
+  private void generateDoll() {
+    if (!(map instanceof GreenLightRedLightMap)) {
+      return;
+    }
+
+    Vector3 dollPosition = ((GreenLightRedLightMap) map).getDollPosition();
+
+    if (dollPosition == null) {
+      return;
+    }
+
+    doll = new Citizen();
+    doll.setPosition(Position.fromObject(dollPosition, map.toLevel()));
+    doll.setSkin(
+      CitizenSkin.from(
+        ((SquidGame) game).skinDataPathToFile().toPath().resolve("doll.png")
+      )
+    );
+    doll.setScale(3);
+    doll.setInvokeAttribute(
+      new InvokeAttribute(doll) {
+        @Override
+        public void invoke(@NonNull Player player) {
+          player.sendMessage(TextFormat.RED + "Do not touch me....");
+        }
+      }
+    );
+    doll.lookAt(map.getSafeSpawn());
+
+    game.getCitizenLibrary().getFactory().add(doll);
+  }
+
+  private void spawnDoll() {
+    if (doll == null) {
+      return;
+    }
+
+    getOnlinePlayers().forEach(player -> doll.spawnTo(player));
   }
 
   private void singDoll() {
@@ -43,8 +95,12 @@ public class GreenLightRedLight extends Microgame {
       !roundWinners.contains(player);
 
     broadcastMessage("&l&a» &r&fGreen light!", condition);
-    broadcastTitle("&aGreen Light!", "&fYou can move.");
+    broadcastTitle("&aGreen Light!", "&fYou can move.", condition);
     broadcastSound("mob.ghast.moan", condition);
+
+    if (doll != null) {
+      doll.lookAt(map.getSafeSpawn());
+    }
 
     giveGreenWool();
 
@@ -53,8 +109,18 @@ public class GreenLightRedLight extends Microgame {
     schedule(
       () -> {
         broadcastMessage("&l&c» &r&fRed light!", condition);
-        broadcastTitle("&cRed Light!", "You can not move.");
+        broadcastTitle("&cRed Light!", "You can not move.", condition);
         broadcastSound("mob.blaze.hit", condition);
+
+        if (doll != null) {
+          Vector3 newVector = doll
+            .getPosition()
+            .subtract(map.getSafeSpawn())
+            .asVector3f()
+            .asVector3();
+
+          doll.lookAt(newVector);
+        }
 
         giveRedWool();
 
@@ -125,7 +191,7 @@ public class GreenLightRedLight extends Microgame {
     }
 
     if (
-      ((GreenLightRedLightMap) map).isGoalArea(playerPosition) &&
+      ((GreenLightRedLightMap) map).isTheGoal(playerPosition) &&
       !roundWinners.contains(player)
     ) {
       win(player);
@@ -133,8 +199,26 @@ public class GreenLightRedLight extends Microgame {
   }
 
   @Override
+  public void lose(Player player, boolean teleport) {
+    if (doll != null) {
+      ParticleUtils.fireShoot(
+        doll.getPosition().add(0, 1.5),
+        player.getPosition()
+      );
+    }
+
+    super.lose(player, teleport);
+  }
+
+  @Override
   public void onGameUpdate() {}
 
   @Override
-  public void onGameEnd() {}
+  public void onGameEnd() {
+    despairDoll();
+  }
+
+  private void despairDoll() {
+    getOnlinePlayers().forEach(player -> doll.despairFrom(player));
+  }
 }

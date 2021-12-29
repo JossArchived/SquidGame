@@ -1,7 +1,6 @@
 package jossc.squidgame.phase;
 
 import cn.nukkit.Player;
-import cn.nukkit.entity.Entity;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
 import cn.nukkit.event.block.BlockBreakEvent;
@@ -25,11 +24,14 @@ import java.util.List;
 import java.util.Map;
 import lombok.Setter;
 import net.josscoder.gameapi.Game;
+import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.phase.GamePhase;
 import net.josscoder.gameapi.user.User;
 import net.josscoder.gameapi.util.TimeUtils;
 
 public abstract class Microgame extends GamePhase {
+
+  protected boolean onGameStartWasCalled = false;
 
   protected int startCountdown = 11;
 
@@ -43,9 +45,7 @@ public abstract class Microgame extends GamePhase {
   }
 
   @Override
-  protected void onStart() {
-    getNeutralPlayers().forEach(Entity::setImmobile);
-  }
+  protected void onStart() {}
 
   @Override
   public void onUpdate() {
@@ -61,7 +61,13 @@ public abstract class Microgame extends GamePhase {
         broadcastSound("note.bassattack", 2, 2);
 
         if (startCountdown == 5 && map != null) {
-          getOnlinePlayers().forEach(player -> map.teleportToSafeSpawn(player));
+          getOnlinePlayers()
+            .forEach(
+              player -> {
+                player.setImmobile();
+                map.teleportToSafeSpawn(player);
+              }
+            );
         }
 
         return;
@@ -86,6 +92,7 @@ public abstract class Microgame extends GamePhase {
                 }
               );
             onGameStart();
+            onGameStartWasCalled = true;
           },
           20 * 6
         );
@@ -94,11 +101,13 @@ public abstract class Microgame extends GamePhase {
       return;
     }
 
-    broadcastActionBar(
-      "&bThis microgame ends in &l" +
-      TimeUtils.timeToString((int) getRemainingDuration().getSeconds())
-    );
-    onGameUpdate();
+    if (onGameStartWasCalled) {
+      broadcastActionBar(
+        "&bThis microgame ends in &l" +
+        TimeUtils.timeToString((int) getRemainingDuration().getSeconds())
+      );
+      onGameUpdate();
+    }
   }
 
   public List<Player> getRoundLosers() {
@@ -148,11 +157,17 @@ public abstract class Microgame extends GamePhase {
       return;
     }
 
-    getRoundLosers().forEach(this::lose);
+    getRoundLosers().forEach(player -> lose(player, false));
 
     roundWinners.clear();
 
-    game.schedule(this::onGameEnd, 20 * 4);
+    onGameEnd();
+
+    GameMap mainMap = game.getGameMapManager().getMainMap();
+
+    if (mainMap != null) {
+      getOnlinePlayers().forEach(mainMap::teleportToSafeSpawn);
+    }
   }
 
   public abstract String getName();
@@ -182,17 +197,26 @@ public abstract class Microgame extends GamePhase {
   }
 
   public void lose(Player player) {
+    lose(player, true);
+  }
+
+  public void lose(Player player, boolean teleport) {
     User user = userFactory.get(player);
 
     if (user == null) {
       return;
     }
 
-    if (map != null) {
+    if (map != null && teleport) {
       map.teleportToSafeSpawn(player);
     }
 
     user.convertSpectator(true, false);
+
+    int position = user.getLocalStorage().get("position");
+
+    broadcastMessage("&l&6» &r&fPlayer &6" + position + "&f was eliminated!");
+    broadcastSound("mob.guardian.death");
   }
 
   private void giveArmor(Player player) {

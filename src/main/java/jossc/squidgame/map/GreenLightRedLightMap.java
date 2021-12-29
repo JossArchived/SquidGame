@@ -12,12 +12,13 @@ public class GreenLightRedLightMap extends Map {
 
   private Vector3 goalCornerOne = null;
   private Vector3 goalCornerTwo = null;
+  private Vector3 dollPosition = null;
 
   public GreenLightRedLightMap(Game game, String name, Vector3 safeSpawn) {
     super(game, name, safeSpawn);
   }
 
-  public boolean isGoalArea(Vector3 vector3) {
+  public boolean isTheGoal(Vector3 vector3) {
     if (goalCornerOne == null || goalCornerTwo == null) {
       return true;
     }
