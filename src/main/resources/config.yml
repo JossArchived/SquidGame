@@ -1,3 +1,20 @@
+developmentMode: true
+defaultGamemode: 0
+maxPlayers: 100
+minPlayers: 3
+
 maps:
-  room:
-  greenligth_redlight:
+  waitingRoomMap:
+    name: "waitingRoom"
+    safeSpawn: "0:100:0"
+    exitEntitySpawn: "0:100:0"
+    pedestalCenterSpawn: "0:100:0"
+    pedestalOneSpawn: "0:100:0"
+    pedestalTwoSpawn: "0:100:0"
+    pedestalThreeSpawn: "0:100:0"
+  greenLightRedLightMap:
+    name: "squidGame"
+    safeSpawn: "0:100:0"
+    goalCornerOne: "0:100:0"
+    goalCornerTwo: "0:100:0"
+    dollPosition: "0:100:0"

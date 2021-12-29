@@ -15,6 +15,7 @@ import cn.nukkit.inventory.PlayerInventory;
 import cn.nukkit.item.ItemBootsLeather;
 import cn.nukkit.item.ItemChestplateLeather;
 import cn.nukkit.item.ItemLeggingsLeather;
+import cn.nukkit.utils.Config;
 import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
@@ -42,6 +43,7 @@ public abstract class Microgame extends GamePhase {
 
   public Microgame(Game game, Duration duration) {
     super(game, duration);
+    setupMap(game.getConfig());
   }
 
   @Override
@@ -173,6 +175,8 @@ public abstract class Microgame extends GamePhase {
   public abstract String getName();
 
   public abstract String getInstruction();
+
+  public abstract void setupMap(Config config);
 
   public abstract void onGameStart();
 

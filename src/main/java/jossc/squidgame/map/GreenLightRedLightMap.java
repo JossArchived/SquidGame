@@ -10,12 +10,22 @@ import net.josscoder.gameapi.map.Map;
 @Getter
 public class GreenLightRedLightMap extends Map {
 
-  private Vector3 goalCornerOne = null;
-  private Vector3 goalCornerTwo = null;
-  private Vector3 dollPosition = null;
+  private Vector3 goalCornerOne;
+  private Vector3 goalCornerTwo;
+  private Vector3 dollPosition;
 
-  public GreenLightRedLightMap(Game game, String name, Vector3 safeSpawn) {
+  public GreenLightRedLightMap(
+    Game game,
+    String name,
+    Vector3 safeSpawn,
+    Vector3 goalCornerOne,
+    Vector3 goalCornerTwo,
+    Vector3 dollPosition
+  ) {
     super(game, name, safeSpawn);
+    this.goalCornerOne = goalCornerOne;
+    this.goalCornerTwo = goalCornerTwo;
+    this.dollPosition = dollPosition;
   }
 
   public boolean isTheGoal(Vector3 vector3) {

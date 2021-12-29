@@ -1,5 +1,6 @@
 package jossc.squidgame;
 
+import cn.nukkit.utils.ConfigSection;
 import cn.nukkit.utils.TextFormat;
 import java.io.File;
 import java.time.Duration;
@@ -7,7 +8,9 @@ import java.util.List;
 import java.util.UUID;
 import jossc.squidgame.phase.GreenLightRedLight;
 import net.josscoder.gameapi.Game;
+import net.josscoder.gameapi.map.WaitingRoomMap;
 import net.josscoder.gameapi.phase.GamePhase;
+import net.josscoder.gameapi.util.VectorUtils;
 
 public class SquidGame extends Game {
 
@@ -28,23 +31,56 @@ public class SquidGame extends Game {
 
   @Override
   public void init() {
-    saveResource("config.yml");
+    initGameSettings();
+
+    if (isDevelopmentMode()) {
+      return;
+    }
 
     moveResourcesToDataPath("skin");
-
-    initGameSettings();
 
     List<GamePhase> lobbyPhases = createPreGamePhase();
 
     phaseSeries.addAll(lobbyPhases);
-    phaseSeries.add(new GreenLightRedLight(this, Duration.ofMinutes(5))); //TODO: set map
+    phaseSeries.add(new GreenLightRedLight(this, Duration.ofMinutes(5)));
     phaseSeries.start();
 
     registerPhaseCommands();
   }
 
   private void initGameSettings() {
-    //TODO: finish this tomorrow
+    saveResource("config.yml");
+
+    setDevelopmentMode(getConfig().getBoolean("developmentMode"));
+    setDefaultGamemode(getConfig().getInt("defaultGamemode"));
+    setMaxPlayers(getConfig().getInt("maxPlayers"));
+    setMinPlayers(getConfig().getInt("minPlayers"));
+
+    setCanMoveInPreGame(true);
+    setCanVoteMap(false);
+
+    ConfigSection section = getConfig().getSection("maps.waitingRoomMap");
+
+    WaitingRoomMap waitingRoomMap = new WaitingRoomMap(
+      this,
+      section.getString("name"),
+      VectorUtils.stringToVector(section.getString("safeSpawn")),
+      VectorUtils.stringToVector(section.getString("exitEntitySpawn"))
+    );
+    waitingRoomMap.setPedestalCenterSpawn(
+      VectorUtils.stringToVector(section.getString("pedestalCenterSpawn"))
+    );
+    waitingRoomMap.setPedestalOneSpawn(
+      VectorUtils.stringToVector(section.getString("pedestalOneSpawn"))
+    );
+    waitingRoomMap.setPedestalTwoSpawn(
+      VectorUtils.stringToVector(section.getString("pedestalTwoSpawn"))
+    );
+    waitingRoomMap.setPedestalThreeSpawn(
+      VectorUtils.stringToVector(section.getString("pedestalThreeSpawn"))
+    );
+
+    setWaitingRoomMap(waitingRoomMap);
   }
 
   public File skinDataPathToFile() {
