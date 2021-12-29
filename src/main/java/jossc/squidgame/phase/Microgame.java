@@ -39,7 +39,7 @@ public abstract class Microgame extends GamePhase {
   protected List<Player> roundWinners = new ArrayList<>();
 
   @Setter
-  protected net.josscoder.gameapi.map.Map map = null;
+  protected GameMap map = null;
 
   public Microgame(Game game, Duration duration) {
     super(game, duration);
@@ -191,12 +191,15 @@ public abstract class Microgame extends GamePhase {
       return;
     }
 
+    roundWinners.add(player);
+
     user.giveDefaultAttributes();
 
     player.sendTitle(
       TextFormat.colorize("&bYou won this game!"),
       TextFormat.WHITE + "You will continue in the next game."
     );
+
     playSound(player, "random.levelup", 2, 3);
   }
 

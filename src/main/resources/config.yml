@@ -12,6 +12,9 @@ maps:
     pedestalOneSpawn: "0:100:0"
     pedestalTwoSpawn: "0:100:0"
     pedestalThreeSpawn: "0:100:0"
+  roomMap:
+    name: "squidgame"
+    safeSpawn: "0:100:0"
   greenLightRedLightMap:
     name: "squidGame"
     safeSpawn: "0:100:0"

@@ -4,11 +4,11 @@ import cn.nukkit.math.Vector3;
 import lombok.Getter;
 import lombok.Setter;
 import net.josscoder.gameapi.Game;
-import net.josscoder.gameapi.map.Map;
+import net.josscoder.gameapi.map.GameMap;
 
 @Setter
 @Getter
-public class GreenLightRedLightMap extends Map {
+public class GreenLightRedLightMap extends GameMap {
 
   private Vector3 goalCornerOne;
   private Vector3 goalCornerTwo;

@@ -78,13 +78,15 @@ public class GreenLightRedLight extends Microgame {
     }
 
     doll = new Citizen();
-    doll.setPosition(Position.fromObject(dollPosition, map.toLevel()));
+    doll.setPosition(
+      Position.fromObject(dollPosition.add(0.5, 1, 0.5), map.toLevel())
+    );
     doll.setSkin(
       CitizenSkin.from(
         ((SquidGame) game).skinDataPathToFile().toPath().resolve("doll.png")
       )
     );
-    doll.setScale(3);
+    doll.setScale(3.5f);
     doll.setInvokeAttribute(
       new InvokeAttribute(doll) {
         @Override
@@ -117,7 +119,13 @@ public class GreenLightRedLight extends Microgame {
     broadcastSound("mob.ghast.moan", condition);
 
     if (doll != null) {
-      doll.lookAt(map.getSafeSpawn());
+      Vector3 newVector = doll
+        .getPosition()
+        .subtract(map.getSafeSpawn())
+        .asVector3f()
+        .asVector3();
+
+      doll.lookAt(newVector);
     }
 
     giveGreenWool();
@@ -131,13 +139,7 @@ public class GreenLightRedLight extends Microgame {
         broadcastSound("mob.blaze.hit", condition);
 
         if (doll != null) {
-          Vector3 newVector = doll
-            .getPosition()
-            .subtract(map.getSafeSpawn())
-            .asVector3f()
-            .asVector3();
-
-          doll.lookAt(newVector);
+          doll.lookAt(map.getSafeSpawn());
         }
 
         giveRedWool();
@@ -224,6 +226,7 @@ public class GreenLightRedLight extends Microgame {
         player.getPosition()
       );
     }
+    //TODO: verify if this is work
 
     super.lose(player, teleport);
   }
