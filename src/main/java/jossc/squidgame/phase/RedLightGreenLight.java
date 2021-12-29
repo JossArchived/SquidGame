@@ -12,8 +12,8 @@ import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import java.util.function.Predicate;
 import jossc.squidgame.SquidGame;
-import jossc.squidgame.map.GreenLightRedLightMap;
-import jossc.squidgame.util.ParticleUtils;
+import jossc.squidgame.map.RedLightGreenLightMap;
+import lombok.Getter;
 import lombok.NonNull;
 import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.api.event.user.PlayerRequestToLoseEvent;
@@ -24,20 +24,21 @@ import org.citizen.attributes.CitizenSkin;
 import org.citizen.attributes.InvokeAttribute;
 import org.citizen.entity.Citizen;
 
-public class GreenLightRedLight extends Microgame {
+public class RedLightGreenLight extends Microgame {
 
   private boolean canWalk = true;
 
+  @Getter
   private Citizen doll = null;
 
-  public GreenLightRedLight(Game game, Duration duration) {
+  public RedLightGreenLight(Game game, Duration duration) {
     super(game, duration);
     generateDoll();
   }
 
   @Override
   public String getName() {
-    return "Red light & Green light";
+    return "Red light, Green light";
   }
 
   @Override
@@ -50,7 +51,7 @@ public class GreenLightRedLight extends Microgame {
     ConfigSection section = config.getSection("maps.greenLightRedLightMap");
 
     map =
-      new GreenLightRedLightMap(
+      new RedLightGreenLightMap(
         game,
         section.getString("name"),
         VectorUtils.stringToVector(section.getString("safeSpawn")),
@@ -67,11 +68,11 @@ public class GreenLightRedLight extends Microgame {
   }
 
   private void generateDoll() {
-    if (!(map instanceof GreenLightRedLightMap)) {
+    if (!(map instanceof RedLightGreenLightMap)) {
       return;
     }
 
-    Vector3 dollPosition = ((GreenLightRedLightMap) map).getDollPosition();
+    Vector3 dollPosition = ((RedLightGreenLightMap) map).getDollPosition();
 
     if (dollPosition == null) {
       return;
@@ -191,7 +192,7 @@ public class GreenLightRedLight extends Microgame {
 
   @EventHandler
   public void onMove(PlayerMoveEvent event) {
-    if (!(map instanceof GreenLightRedLightMap)) {
+    if (!(map instanceof RedLightGreenLightMap)) {
       return;
     }
 
@@ -211,24 +212,11 @@ public class GreenLightRedLight extends Microgame {
     }
 
     if (
-      ((GreenLightRedLightMap) map).isTheGoal(playerPosition) &&
+      ((RedLightGreenLightMap) map).isTheGoal(playerPosition) &&
       !roundWinners.contains(player)
     ) {
       win(player);
     }
-  }
-
-  @Override
-  public void lose(Player player, boolean teleport) {
-    if (doll != null) {
-      ParticleUtils.fireShoot(
-        doll.getPosition().add(0, 1.5),
-        player.getPosition()
-      );
-    }
-    //TODO: verify if this is work
-
-    super.lose(player, teleport);
   }
 
   @Override

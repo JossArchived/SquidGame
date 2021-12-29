@@ -23,18 +23,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import jossc.squidgame.SquidGame;
+import jossc.squidgame.util.ParticleUtils;
 import lombok.Setter;
 import net.josscoder.gameapi.Game;
+import net.josscoder.gameapi.api.event.user.UserJoinServerEvent;
 import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.phase.GamePhase;
 import net.josscoder.gameapi.user.User;
 import net.josscoder.gameapi.util.TimeUtils;
+import org.citizen.entity.Citizen;
 
 public abstract class Microgame extends GamePhase {
 
   protected boolean onGameStartWasCalled = false;
 
+  protected boolean canStartCountdown = false;
+
   protected int startCountdown = 11;
+
+  @Setter
+  protected int microgameCount;
 
   protected List<Player> roundWinners = new ArrayList<>();
 
@@ -42,16 +51,44 @@ public abstract class Microgame extends GamePhase {
   protected GameMap map = null;
 
   public Microgame(Game game, Duration duration) {
+    this(game, duration, 0);
+  }
+
+  public Microgame(Game game, Duration duration, int microgameCount) {
     super(game, duration);
+    this.microgameCount = microgameCount;
+
     setupMap(game.getConfig());
   }
 
   @Override
-  protected void onStart() {}
+  protected void onStart() {
+    schedule(
+      () -> {
+        String instruction = getInstruction();
+
+        if (instruction.isEmpty()) {
+          return;
+        }
+
+        broadcastMessage(
+          "&b#" +
+          microgameCount +
+          " &7" +
+          getName() +
+          " &e&l» &r&f" +
+          instruction
+        );
+      },
+      20 * 4
+    );
+
+    schedule(() -> canStartCountdown = true, 20 * 7);
+  }
 
   @Override
   public void onUpdate() {
-    if (startCountdown >= 0) {
+    if (canStartCountdown && startCountdown >= 0) {
       broadcastActionBar("&bAlive players &l" + countNeutralPlayers());
 
       startCountdown--;
@@ -76,28 +113,15 @@ public abstract class Microgame extends GamePhase {
       }
 
       if (startCountdown == 0) {
-        String instruction = getInstruction();
-
-        if (instruction.isEmpty()) {
-          return;
-        }
-
-        broadcastMessage("&7" + getName() + " &e&l» &r&f" + instruction);
-
-        schedule(
-          () -> {
-            getNeutralPlayers()
-              .forEach(
-                player -> {
-                  player.setImmobile(false);
-                  giveArmor(player);
-                }
-              );
-            onGameStart();
-            onGameStartWasCalled = true;
-          },
-          20 * 6
-        );
+        getNeutralPlayers()
+          .forEach(
+            player -> {
+              player.setImmobile(false);
+              giveArmor(player);
+            }
+          );
+        onGameStart();
+        onGameStartWasCalled = true;
       }
 
       return;
@@ -129,7 +153,13 @@ public abstract class Microgame extends GamePhase {
 
   @Override
   public boolean isReadyToEnd() {
-    return super.isReadyToEnd() || countNeutralPlayers() <= 1;
+    return (
+      super.isReadyToEnd() ||
+      countNeutralPlayers() <= 1 ||
+      countNeutralPlayers() == roundWinners.size() ||
+      countNeutralPlayers() == roundWinners.size() &&
+      microgameCount == ((SquidGame) game).getMicroGamesCount()
+    );
   }
 
   @Override
@@ -156,6 +186,16 @@ public abstract class Microgame extends GamePhase {
         game.end(null);
       }
 
+      return;
+    }
+
+    if (
+      countNeutralPlayers() == roundWinners.size() &&
+      microgameCount == ((SquidGame) game).getMicroGamesCount()
+    ) {
+      broadcastMessage("&c&l» &r&cBad news... There was a tie!");
+
+      game.end(null);
       return;
     }
 
@@ -214,16 +254,27 @@ public abstract class Microgame extends GamePhase {
       return;
     }
 
+    broadcastMessage(
+      "&l&6» &r&fPlayer &6" + (player.getNetworkId() + 2) + "&f was eliminated!"
+    );
+    broadcastSound("mob.guardian.death");
+
     if (map != null && teleport) {
       map.teleportToSafeSpawn(player);
     }
 
+    if (this instanceof RedLightGreenLight) {
+      Citizen doll = ((RedLightGreenLight) this).getDoll();
+
+      if (doll != null) {
+        ParticleUtils.fireShoot(
+          doll.getPosition().add(0, 1.5),
+          player.getPosition()
+        );
+      }
+    }
+
     user.convertSpectator(true, false);
-
-    int position = user.getLocalStorage().get("position");
-
-    broadcastMessage("&l&6» &r&fPlayer &6" + position + "&f was eliminated!");
-    broadcastSound("mob.guardian.death");
   }
 
   private void giveArmor(Player player) {
@@ -249,6 +300,12 @@ public abstract class Microgame extends GamePhase {
     if (user != null) {
       user.updateInventory();
     }
+  }
+
+  @EventHandler
+  @Override
+  public void onJoin(UserJoinServerEvent event) {
+    super.onJoin(event);
   }
 
   @EventHandler(priority = EventPriority.HIGHEST)

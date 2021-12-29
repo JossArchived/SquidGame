@@ -6,15 +6,21 @@ import java.io.File;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
-import jossc.squidgame.phase.GreenLightRedLight;
+import jossc.squidgame.phase.Microgame;
+import jossc.squidgame.phase.RedLightGreenLight;
+import lombok.Getter;
 import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.map.WaitingRoomMap;
 import net.josscoder.gameapi.phase.GamePhase;
 import net.josscoder.gameapi.phase.PhaseSeries;
 import net.josscoder.gameapi.util.VectorUtils;
+import net.minikloon.fsmgasm.State;
 
 public class SquidGame extends Game {
+
+  @Getter
+  private int microGamesCount = 0;
 
   private GameMap roomMap;
 
@@ -50,7 +56,18 @@ public class SquidGame extends Game {
     List<GamePhase> lobbyPhases = createPreGamePhase();
 
     phaseSeries.addAll(lobbyPhases);
-    phaseSeries.add(new GreenLightRedLight(this, Duration.ofMinutes(5)));
+    phaseSeries.add(new RedLightGreenLight(this, Duration.ofMinutes(5)));
+
+    for (State phase : phaseSeries) {
+      if (!(phase instanceof Microgame)) {
+        continue;
+      }
+
+      ((Microgame) phase).setMicrogameCount(microGamesCount + 1);
+
+      microGamesCount++;
+    }
+
     phaseSeries.start();
 
     registerPhaseCommands();
@@ -109,6 +126,8 @@ public class SquidGame extends Game {
         roomMapSection.getString("name"),
         VectorUtils.stringToVector(roomMapSection.getString("safeSpawn"))
       );
+
+    gameMapManager.addMap(roomMap);
   }
 
   public File skinDataPathToFile() {

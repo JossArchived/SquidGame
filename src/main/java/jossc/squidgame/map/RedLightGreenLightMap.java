@@ -8,13 +8,13 @@ import net.josscoder.gameapi.map.GameMap;
 
 @Setter
 @Getter
-public class GreenLightRedLightMap extends GameMap {
+public class RedLightGreenLightMap extends GameMap {
 
   private Vector3 goalCornerOne;
   private Vector3 goalCornerTwo;
   private Vector3 dollPosition;
 
-  public GreenLightRedLightMap(
+  public RedLightGreenLightMap(
     Game game,
     String name,
     Vector3 safeSpawn,
