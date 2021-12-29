@@ -205,7 +205,7 @@ public class GreenLightRedLight extends Microgame {
       !isReadyToEnd() &&
       !player.isSpectator()
     ) {
-      lose(player);
+      lose(player, true);
 
       return;
     }
