@@ -40,6 +40,7 @@ public class SquidGame extends Microgame {
         section.getString("name"),
         VectorUtils.stringToVector(section.getString("safeSpawn"))
       );
+    //TODO: u can add spawns
   }
 
   @Override

@@ -13,14 +13,13 @@ import cn.nukkit.inventory.*;
 import cn.nukkit.item.ItemBootsLeather;
 import cn.nukkit.item.ItemChestplateLeather;
 import cn.nukkit.item.ItemLeggingsLeather;
+import cn.nukkit.level.Position;
+import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import jossc.squidgame.SquidGameClass;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,6 +28,7 @@ import net.josscoder.gameapi.api.event.user.UserJoinServerEvent;
 import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.phase.GamePhase;
 import net.josscoder.gameapi.user.User;
+import net.josscoder.gameapi.util.MathUtils;
 import net.josscoder.gameapi.util.TimeUtils;
 
 public abstract class Microgame extends GamePhase {
@@ -98,13 +98,21 @@ public abstract class Microgame extends GamePhase {
         broadcastSound("note.bassattack", 2, 2);
 
         if (startCountdown == 5 && map != null) {
-          getOnlinePlayers()
-            .forEach(
-              player -> {
-                player.setImmobile();
-                map.teleportToSafeSpawn(player);
-              }
-            );
+          if (map.getSpawns().isEmpty()) {
+            getOnlinePlayers()
+              .forEach(
+                player -> {
+                  player.setImmobile();
+                  map.teleportToSafeSpawn(player);
+                }
+              );
+          } else {
+            List<Vector3> spawns = map.getSpawns();
+            Set<Integer> spawnsUsed = new HashSet<>();
+
+            getNeutralPlayers()
+              .forEach(player -> spawnPlayer(player, map, spawns, spawnsUsed));
+          }
         }
 
         return;
@@ -152,6 +160,27 @@ public abstract class Microgame extends GamePhase {
       );
 
     return losers;
+  }
+
+  private void spawnPlayer(
+    Player player,
+    GameMap map,
+    List<Vector3> spawns,
+    Set<Integer> spawnsUsed
+  ) {
+    int i;
+
+    do {
+      i = MathUtils.nextInt(spawns.size());
+    } while (spawnsUsed.contains(i));
+
+    Vector3 spawn = spawns.get(i);
+
+    player.setImmobile();
+
+    player.teleport(Position.fromObject(spawn, map.toLevel()));
+
+    spawnsUsed.add(i);
   }
 
   @Override
