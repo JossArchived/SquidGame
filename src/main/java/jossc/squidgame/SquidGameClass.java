@@ -7,7 +7,9 @@ import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 import jossc.squidgame.phase.Microgame;
+import jossc.squidgame.phase.NightAmbush;
 import jossc.squidgame.phase.RedLightGreenLight;
+import jossc.squidgame.phase.SquidGame;
 import lombok.Getter;
 import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.map.GameMap;
@@ -17,11 +19,12 @@ import net.josscoder.gameapi.phase.PhaseSeries;
 import net.josscoder.gameapi.util.VectorUtils;
 import net.minikloon.fsmgasm.State;
 
-public class SquidGame extends Game {
+public class SquidGameClass extends Game {
 
   @Getter
   private int microGamesCount = 0;
 
+  @Getter
   private GameMap roomMap;
 
   @Override
@@ -57,6 +60,12 @@ public class SquidGame extends Game {
 
     phaseSeries.addAll(lobbyPhases);
     phaseSeries.add(new RedLightGreenLight(this, Duration.ofMinutes(5)));
+    //SugarHoneycombs
+    phaseSeries.add(new NightAmbush(this, Duration.ofMinutes(2)));
+    //TugOfWar
+    //Marbles
+    //Hopscotch
+    phaseSeries.add(new SquidGame(this, Duration.ofMinutes(10)));
 
     for (State phase : phaseSeries) {
       if (!(phase instanceof Microgame)) {

@@ -3,15 +3,13 @@ package jossc.squidgame.phase;
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
-import cn.nukkit.event.block.BlockBreakEvent;
-import cn.nukkit.event.block.BlockBurnEvent;
-import cn.nukkit.event.block.BlockPlaceEvent;
-import cn.nukkit.event.entity.CreatureSpawnEvent;
-import cn.nukkit.event.entity.EntityDamageByBlockEvent;
-import cn.nukkit.event.entity.EntityDamageEvent;
-import cn.nukkit.event.player.PlayerDropItemEvent;
-import cn.nukkit.event.player.PlayerFoodLevelChangeEvent;
-import cn.nukkit.inventory.PlayerInventory;
+import cn.nukkit.event.block.*;
+import cn.nukkit.event.entity.*;
+import cn.nukkit.event.inventory.CraftItemEvent;
+import cn.nukkit.event.inventory.InventoryOpenEvent;
+import cn.nukkit.event.inventory.InventoryPickupItemEvent;
+import cn.nukkit.event.player.*;
+import cn.nukkit.inventory.*;
 import cn.nukkit.item.ItemBootsLeather;
 import cn.nukkit.item.ItemChestplateLeather;
 import cn.nukkit.item.ItemLeggingsLeather;
@@ -23,7 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import jossc.squidgame.SquidGame;
+import jossc.squidgame.SquidGameClass;
+import lombok.Getter;
 import lombok.Setter;
 import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.api.event.user.UserJoinServerEvent;
@@ -46,6 +45,7 @@ public abstract class Microgame extends GamePhase {
   protected List<Player> roundWinners = new ArrayList<>();
 
   @Setter
+  @Getter
   protected GameMap map = null;
 
   public Microgame(Game game, Duration duration) {
@@ -115,6 +115,11 @@ public abstract class Microgame extends GamePhase {
           .forEach(
             player -> {
               player.setImmobile(false);
+              User user = userFactory.get(player);
+
+              if (user != null) {
+                user.giveDefaultAttributes();
+              }
               giveArmor(player);
             }
           );
@@ -156,7 +161,7 @@ public abstract class Microgame extends GamePhase {
       countNeutralPlayers() <= 1 ||
       countNeutralPlayers() == roundWinners.size() ||
       countNeutralPlayers() == roundWinners.size() &&
-      microgameCount == ((SquidGame) game).getMicroGamesCount()
+      microgameCount == ((SquidGameClass) game).getMicroGamesCount()
     );
   }
 
@@ -176,20 +181,22 @@ public abstract class Microgame extends GamePhase {
         pedestalWinners.put(winner, 1);
 
         game.end(pedestalWinners);
-      } else {
-        broadcastMessage(
-          "&c&l» &r&cBad news... There were no winners in this game!"
-        );
 
-        game.end(null);
+        return;
       }
+
+      broadcastMessage(
+        "&c&l» &r&cBad news... There were no winners in this game!"
+      );
+
+      game.end(null);
 
       return;
     }
 
     if (
       countNeutralPlayers() == roundWinners.size() &&
-      microgameCount == ((SquidGame) game).getMicroGamesCount()
+      microgameCount == ((SquidGameClass) game).getMicroGamesCount()
     ) {
       broadcastMessage("&c&l» &r&cBad news... There was a tie!");
 
@@ -197,7 +204,18 @@ public abstract class Microgame extends GamePhase {
       return;
     }
 
-    getRoundLosers().forEach(player -> lose(player, false));
+    if (!(this instanceof NightAmbush)) {
+      getRoundLosers().forEach(player -> lose(player, false));
+    }
+
+    if (countNeutralPlayers() == 0) {
+      broadcastMessage(
+        "&c&l» &r&cBad news... There were no winners in this game!"
+      );
+
+      game.end(null);
+      return;
+    }
 
     roundWinners.clear();
 
@@ -253,7 +271,7 @@ public abstract class Microgame extends GamePhase {
     }
 
     broadcastMessage(
-      "&l&6» &r&fPlayer &6" + (player.getNetworkId() + 2) + "&f was eliminated!"
+      "&l&6» &r&fPlayer &6" + countNeutralPlayers() + "&f was eliminated!"
     );
     broadcastSound("mob.guardian.death");
 
@@ -332,6 +350,108 @@ public abstract class Microgame extends GamePhase {
 
   @EventHandler(priority = EventPriority.HIGHEST)
   public void onFoodLevelChange(PlayerFoodLevelChangeEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.HIGH)
+  public void onIgnite(BlockIgniteEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.HIGH)
+  public void onSpread(BlockSpreadEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.HIGH)
+  public void onLeavesDecay(LeavesDecayEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.HIGH)
+  public void onLiquidFlow(LiquidFlowEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.HIGH)
+  public void onEntityExplode(EntityExplodeEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.HIGH)
+  public void onEntityExplosionPrimed(EntityExplosionPrimeEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST)
+  public void onItemFrameDrop(ItemFrameDropItemEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onPickupItem(InventoryPickupItemEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onBedEnter(PlayerBedEnterEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onBedLeave(PlayerBedLeaveEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onBucketFill(PlayerBucketFillEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onOpenCraftingTable(CraftingTableOpenEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onInventoryOpen(InventoryOpenEvent event) {
+    Inventory inventory = event.getInventory();
+    if (
+      inventory instanceof AnvilInventory ||
+      inventory instanceof BeaconInventory ||
+      inventory instanceof BrewingInventory ||
+      inventory instanceof CraftingGrid ||
+      inventory instanceof DispenserInventory ||
+      inventory instanceof DropperInventory ||
+      inventory instanceof EnchantInventory ||
+      inventory instanceof FurnaceInventory ||
+      inventory instanceof FurnaceRecipe ||
+      inventory instanceof HopperInventory ||
+      inventory instanceof ShapedRecipe ||
+      inventory instanceof ShapelessRecipe ||
+      inventory instanceof MixRecipe
+    ) {
+      event.setCancelled();
+    }
+  }
+
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onDeath(PlayerDeathEvent event) {
+    event.setDeathMessage("");
+  }
+
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onCraftItem(CraftItemEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onPlayerAchievementAwarded(PlayerAchievementAwardedEvent event) {
+    event.setCancelled();
+  }
+
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onLevelFoodChange(PlayerFoodLevelChangeEvent event) {
     event.setCancelled();
   }
 }

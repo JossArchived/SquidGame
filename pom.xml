@@ -23,7 +23,7 @@
                     <archive>
                         <manifest>
                             <mainClass>
-                                jossc.squidgame.SquidGame
+                              jossc.squidgame.SquidGameClass
                             </mainClass>
                         </manifest>
                     </archive>
@@ -84,7 +84,7 @@
         <dependency>
             <groupId>com.github.Josscoder</groupId>
             <artifactId>GameAPI</artifactId>
-            <version>764c2a0045</version>
+            <version>8df998a0ca</version>
         </dependency>
 
     </dependencies>
