@@ -87,11 +87,12 @@ public abstract class Microgame extends GamePhase {
   @Override
   public void onUpdate() {
     if (canStartCountdown && startCountdown >= 0) {
-      broadcastActionBar("&bAlive players &l" + countNeutralPlayers());
+      broadcastBossbar("&bAlive players &l" + countNeutralPlayers(), 100f);
 
       startCountdown--;
 
       if (startCountdown == 10 || startCountdown <= 5 && startCountdown > 0) {
+        broadcastActionBar("&fStarting in &b&l" + startCountdown + "&r!");
         broadcastMessage(
           "&b&l» &r&fThis microgame will starts in &b" + startCountdown + "&f!"
         );
@@ -139,9 +140,10 @@ public abstract class Microgame extends GamePhase {
     }
 
     if (onGameStartWasCalled) {
-      broadcastActionBar(
+      broadcastBossbar(
         "&bThis microgame ends in &l" +
-        TimeUtils.timeToString((int) getRemainingDuration().getSeconds())
+        TimeUtils.timeToString((int) getRemainingDuration().getSeconds()),
+        100f
       );
       onGameUpdate();
     }

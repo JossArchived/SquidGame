@@ -21,3 +21,13 @@ maps:
     goalCornerOne: "0:100:0"
     goalCornerTwo: "0:100:0"
     dollPosition: "0:100:0"
+  sugarHoneycombsMap:
+    name: "squidGame"
+    safeSpawn: "0:100:0"
+    spawns:
+      "1": "0:100:0"
+      "2": "0:100:0"
+      "3": "0:100:0"
+      "4": "0:100:0"
+      "5": "0:100:0"
+      "6": "0:100:0"

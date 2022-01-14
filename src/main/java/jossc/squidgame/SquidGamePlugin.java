@@ -62,7 +62,7 @@ public class SquidGamePlugin extends Game {
 
     phaseSeries.addAll(lobbyPhases);
     phaseSeries.add(new RedLightGreenLight(this, Duration.ofMinutes(5)));
-    //phaseSeries.add(new SugarHoneycombs(this, Duration.ofMinutes(3)));
+    phaseSeries.add(new SugarHoneycombs(this, Duration.ofMinutes(3)));
     phaseSeries.add(new NightAmbush(this, Duration.ofMinutes(2)));
     //TugOfWar
     //Marbles
