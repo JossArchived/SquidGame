@@ -16,10 +16,10 @@ import net.josscoder.gameapi.phase.PhaseSeries;
 import net.josscoder.gameapi.util.VectorUtils;
 import net.minikloon.fsmgasm.State;
 
-public class SquidGameClass extends Game {
+public class SquidGamePlugin extends Game {
 
   @Getter
-  private static SquidGameClass instance;
+  private static SquidGamePlugin instance;
 
   @Getter
   private int microGamesCount = 0;

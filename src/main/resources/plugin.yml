@@ -1,5 +1,5 @@
 name: SquidGame
-main: jossc.squidgame.SquidGameClass
+main: jossc.squidgame.SquidGamePlugin
 api: 1.0.0
 version: ${project.version}
 author: Josscoder

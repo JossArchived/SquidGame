@@ -11,7 +11,7 @@ import cn.nukkit.utils.ConfigSection;
 import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import java.util.function.Predicate;
-import jossc.squidgame.SquidGameClass;
+import jossc.squidgame.SquidGamePlugin;
 import jossc.squidgame.map.RedLightGreenLightMap;
 import lombok.Getter;
 import lombok.NonNull;
@@ -84,7 +84,7 @@ public class RedLightGreenLight extends Microgame {
     );
     doll.setSkin(
       CitizenSkin.from(
-        ((SquidGameClass) game).skinDataPathToFile()
+        ((SquidGamePlugin) game).skinDataPathToFile()
           .toPath()
           .resolve("doll.png")
       )

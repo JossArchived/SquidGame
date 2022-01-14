@@ -23,7 +23,7 @@
                     <archive>
                         <manifest>
                             <mainClass>
-                              jossc.squidgame.SquidGameClass
+                                jossc.squidgame.SquidGamePlugin
                             </mainClass>
                         </manifest>
                     </archive>

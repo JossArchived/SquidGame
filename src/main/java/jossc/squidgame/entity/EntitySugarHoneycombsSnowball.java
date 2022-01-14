@@ -6,7 +6,7 @@ import cn.nukkit.entity.projectile.EntitySnowball;
 import cn.nukkit.level.format.FullChunk;
 import cn.nukkit.level.particle.FlameParticle;
 import cn.nukkit.nbt.tag.CompoundTag;
-import jossc.squidgame.SquidGameClass;
+import jossc.squidgame.SquidGamePlugin;
 import net.josscoder.gameapi.user.User;
 
 public class EntitySugarHoneycombsSnowball extends EntitySnowball {
@@ -36,7 +36,7 @@ public class EntitySugarHoneycombsSnowball extends EntitySnowball {
       return;
     }
 
-    User user = SquidGameClass.getInstance().getUserFactory().get((Player) shootingEntity);
+    User user = SquidGamePlugin.getInstance().getUserFactory().get((Player) shootingEntity);
 
     if (user == null) {
       return;

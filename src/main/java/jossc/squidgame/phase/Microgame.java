@@ -20,7 +20,7 @@ import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import java.util.*;
-import jossc.squidgame.SquidGameClass;
+import jossc.squidgame.SquidGamePlugin;
 import lombok.Getter;
 import lombok.Setter;
 import net.josscoder.gameapi.Game;
@@ -190,7 +190,7 @@ public abstract class Microgame extends GamePhase {
       countNeutralPlayers() <= 1 ||
       countNeutralPlayers() == roundWinners.size() ||
       countNeutralPlayers() == roundWinners.size() &&
-      microgameCount == ((SquidGameClass) game).getMicroGamesCount()
+      microgameCount == ((SquidGamePlugin) game).getMicroGamesCount()
     );
   }
 
@@ -225,7 +225,7 @@ public abstract class Microgame extends GamePhase {
 
     if (
       countNeutralPlayers() == roundWinners.size() &&
-      microgameCount == ((SquidGameClass) game).getMicroGamesCount()
+      microgameCount == ((SquidGamePlugin) game).getMicroGamesCount()
     ) {
       broadcastMessage("&c&l» &r&cBad news... There was a tie!");
 
