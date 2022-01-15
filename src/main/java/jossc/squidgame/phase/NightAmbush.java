@@ -53,14 +53,13 @@ public class NightAmbush extends Microgame {
   }
 
   private void giveWeapons() {
-    getNeutralPlayers()
+    getNeutralUsers()
       .forEach(
-        player -> {
-          player.getInventory().setItem(0, Item.get(ItemID.STONE_SWORD));
+        user -> {
+          Player player = user.getPlayer();
 
-          User user = userFactory.get(player);
-
-          if (user != null) {
+          if (player != null) {
+            player.getInventory().setItem(0, Item.get(ItemID.STONE_SWORD));
             user.updateInventory();
           }
         }
@@ -87,16 +86,7 @@ public class NightAmbush extends Microgame {
 
   @Override
   public void onGameEnd() {
-    getNeutralPlayers()
-      .forEach(
-        player -> {
-          User user = userFactory.get(player);
-
-          if (user != null) {
-            user.giveDefaultAttributes();
-          }
-        }
-      );
+    getNeutralUsers().forEach(User::giveDefaultAttributes);
   }
 
   @EventHandler

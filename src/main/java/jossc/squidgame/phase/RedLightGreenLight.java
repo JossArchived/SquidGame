@@ -114,8 +114,7 @@ public class RedLightGreenLight extends Microgame {
   private void singDoll() {
     int time = MathUtils.nextInt(2, 5);
 
-    Predicate<? super Player> condition = player ->
-      !roundWinners.contains(player);
+    Predicate<? super Player> condition = player -> !isRoundWinner(player);
 
     broadcastMessage("&l&a» &r&fGreen light!", condition);
     broadcastTitle("&aGreen Light!", "&fYou can move.", condition);
@@ -203,7 +202,7 @@ public class RedLightGreenLight extends Microgame {
     Vector3 playerPosition = player.asVector3f().asVector3();
 
     if (
-      !roundWinners.contains(player) &&
+      !isRoundWinner(player) &&
       !canWalk &&
       !isReadyToEnd() &&
       !player.isSpectator()
@@ -215,7 +214,7 @@ public class RedLightGreenLight extends Microgame {
 
     if (
       ((RedLightGreenLightMap) map).isTheGoal(playerPosition) &&
-      !roundWinners.contains(player)
+      !isRoundWinner(player)
     ) {
       win(player);
     }

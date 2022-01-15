@@ -15,7 +15,6 @@ import cn.nukkit.item.ItemID;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.level.MovingObjectPosition;
 import cn.nukkit.level.Position;
-import cn.nukkit.level.Sound;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
@@ -28,6 +27,7 @@ import net.josscoder.gameapi.customitem.CustomItem;
 import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.user.User;
 import net.josscoder.gameapi.user.storage.LocalStorage;
+import net.josscoder.gameapi.util.BlockUtils;
 import net.josscoder.gameapi.util.VectorUtils;
 
 public class SugarHoneycombs extends Microgame {
@@ -104,7 +104,7 @@ public class SugarHoneycombs extends Microgame {
 
   @Override
   public void onGameUpdate() {
-    getNeutralPlayers()
+    getRoundLosers()
       .forEach(
         player -> {
           User user = userFactory.get(player);
@@ -143,51 +143,50 @@ public class SugarHoneycombs extends Microgame {
 
     MovingObjectPosition position = event.getMovingObjectPosition();
 
-    Block block = entity
-      .getLevel()
-      .getBlock(
-        new Position(position.blockX, position.blockY, position.blockZ)
-        .add(0, 0, 1)
-      );
+    List<Block> blocksAround = BlockUtils.getNearbyBlocks(
+      new Position(
+        position.blockX,
+        position.blockY,
+        position.blockZ,
+        player.getLevel()
+      ),
+      1
+    );
 
-    if (block == null || block.getId() == Block.AIR) {
-      return;
-    }
+    for (Block block : blocksAround) {
+      if (block == null) {
+        continue;
+      }
 
-    if (block.getId() == Block.STAINED_HARDENED_CLAY) {
-      User user = userFactory.get(player);
+      if (block.getId() == Block.STAINED_HARDENED_CLAY) {
+        User user = userFactory.get(player);
 
-      if (user != null) {
-        player.getLevel().setBlock(block, new BlockAir(), false, true);
+        if (user != null) {
+          player.getLevel().setBlock(block, new BlockAir(), false, true);
 
-        user.playSound("random.levelup", 2, 3);
+          user.playSound("random.levelup", 2, 3);
 
-        LocalStorage storage = user.getLocalStorage();
+          LocalStorage storage = user.getLocalStorage();
 
-        storage.set("blocks_broken", storage.getInteger("blocks_broken") + 1);
+          storage.set("blocks_broken", storage.getInteger("blocks_broken") + 1);
 
-        user.sendMessage("&l&6» +1 point");
+          user.sendMessage("&l&6» +1 point");
 
-        if (storage.getInteger("blocks_broken") >= 5) {
-          win(player);
+          if (storage.getInteger("blocks_broken") >= 5) {
+            win(player);
+          }
         }
+
+        break;
       }
-    } else {
-      if (
-        !game
-          .callEvent(
-            new EntityDamageEvent(
-              player,
-              EntityDamageEvent.DamageCause.PROJECTILE,
-              1
-            )
-          )
-          .isCancelled()
-      ) {
-        player.setHealth(player.getHealth() - 1);
-        player.getLevel().addSound(player, Sound.GAME_PLAYER_HURT);
-      }
+
+      applyDamage(player);
+      break;
     }
+  }
+
+  private void applyDamage(Player player) {
+    player.attack(1.5f);
   }
 
   @Override
@@ -195,7 +194,7 @@ public class SugarHoneycombs extends Microgame {
   public void onDamage(EntityDamageEvent event) {
     if (
       !canReciveDamage ||
-      !event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE)
+      !event.getCause().equals(EntityDamageEvent.DamageCause.CUSTOM)
     ) {
       super.onDamage(event);
 

@@ -45,17 +45,7 @@ public class SquidGame extends Microgame {
 
   @Override
   public void onGameStart() {
-    getNeutralPlayers()
-      .forEach(
-        player -> {
-          User user = userFactory.get(player);
-
-          if (user != null) {
-            user.giveDefaultAttributes();
-          }
-        }
-      );
-
+    getNeutralUsers().forEach(User::giveDefaultAttributes);
     broadcastMessage("&6&l» &r&fGet safe, pvp is coming soon...");
 
     schedule(

@@ -20,6 +20,7 @@ import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 import jossc.squidgame.SquidGamePlugin;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +34,12 @@ import net.josscoder.gameapi.util.TimeUtils;
 
 public abstract class Microgame extends GamePhase {
 
+  public static final TextFormat[] colors = new TextFormat[] {
+    TextFormat.GREEN,
+    TextFormat.WHITE,
+    TextFormat.DARK_GREEN
+  };
+
   protected boolean onGameStartWasCalled = false;
 
   protected boolean canStartCountdown = false;
@@ -42,7 +49,7 @@ public abstract class Microgame extends GamePhase {
   @Setter
   protected int microgameCount;
 
-  protected List<Player> roundWinners = new ArrayList<>();
+  private final List<Player> roundWinners = new ArrayList<>();
 
   @Setter
   @Getter
@@ -61,23 +68,6 @@ public abstract class Microgame extends GamePhase {
 
   @Override
   protected void onStart() {
-    getNeutralPlayers()
-      .forEach(
-        player -> {
-          User user = userFactory.get(player);
-
-          if (user != null) {
-            user.giveDefaultAttributes();
-            user.sendBossBar(
-              TextFormat.BOLD.toString() +
-              TextFormat.DARK_GREEN +
-              "PREPARING MICROGAME",
-              100
-            );
-          }
-        }
-      );
-
     schedule(
       () -> {
         String instruction = getInstruction();
@@ -105,9 +95,9 @@ public abstract class Microgame extends GamePhase {
   public void onUpdate() {
     if (canStartCountdown && startCountdown >= 0) {
       broadcastBossbar(
-        "Alive players &b&l" +
+        "&f&lPLAYERS &b" +
         countNeutralPlayers() +
-        "&r Starting in &b&l" +
+        "&f STARTING IN &b" +
         startCountdown,
         100
       );
@@ -142,48 +132,70 @@ public abstract class Microgame extends GamePhase {
       }
 
       if (startCountdown == 0) {
-        getNeutralPlayers()
+        getNeutralUsers()
           .forEach(
-            player -> {
-              player.setImmobile(false);
-              User user = userFactory.get(player);
+            user -> {
+              Player player = user.getPlayer();
 
-              if (user != null) {
+              if (player != null) {
+                player.setImmobile(false);
                 user.giveDefaultAttributes();
+                giveArmor(player);
               }
-              giveArmor(player);
             }
           );
         onGameStart();
         onGameStartWasCalled = true;
       }
+    } else if (onGameStartWasCalled) {
+      int reamingDurationToSeconds = (int) getRemainingDuration().getSeconds();
 
-      return;
-    }
+      if (
+        reamingDurationToSeconds == 15 ||
+        reamingDurationToSeconds == 10 ||
+        reamingDurationToSeconds <= 5 &&
+        reamingDurationToSeconds > 0
+      ) {
+        broadcastMessage(
+          "&c&l» &r&fThis microgame will ends in &b" +
+          reamingDurationToSeconds +
+          "&f!"
+        );
+        broadcastSound("note.bassattack", 2, 2);
+      }
 
-    if (onGameStartWasCalled) {
       broadcastBossbar(
-        "&bTHIS MICROGAME ENDS IN &l" +
-        TimeUtils.timeToString((int) getRemainingDuration().getSeconds()),
+        "&l&fTHIS MICROGAME ENDS IN &b" +
+        TimeUtils.timeToString(reamingDurationToSeconds),
         100
       );
+
       onGameUpdate();
+    } else {
+      getNeutralUsers()
+        .forEach(
+          user -> {
+            user.giveDefaultAttributes();
+            user.sendBossBar(
+              TextFormat.BOLD.toString() +
+              colors[MathUtils.nextInt(0, colors.length - 1)] +
+              "PREPARING MICROGAME",
+              100
+            );
+          }
+        );
     }
   }
 
+  public boolean isRoundWinner(Player player) {
+    return roundWinners.contains(player);
+  }
+
   public List<Player> getRoundLosers() {
-    List<Player> losers = new ArrayList<>();
-
-    getNeutralPlayers()
-      .forEach(
-        player -> {
-          if (!roundWinners.contains(player)) {
-            losers.add(player);
-          }
-        }
-      );
-
-    return losers;
+    return getNeutralPlayers()
+      .stream()
+      .filter(player -> !isRoundWinner(player))
+      .collect(Collectors.toList());
   }
 
   private void spawnPlayer(
@@ -247,12 +259,19 @@ public abstract class Microgame extends GamePhase {
       return;
     }
 
-    if (
-      countNeutralPlayers() == roundWinners.size() &&
-      microgameCount == ((SquidGamePlugin) game).getMicroGamesCount()
-    ) {
-      broadcastMessage("&c&l» &r&cBad news... There was a tie!");
+    if (countNeutralPlayers() == roundWinners.size()) {
+      if (microgameCount == ((SquidGamePlugin) game).getMicroGamesCount()) {
+        broadcastMessage("&c&l» &r&cBad news... There was a tie!");
+        game.end(null);
+      } else {
+        broadcastMessage("&a&l» &rAll players won this round!");
+      }
+    }
 
+    if (countNeutralPlayers() == 0) {
+      broadcastMessage(
+        "&c&l» &r&cBad news... There were no winners in this game!"
+      );
       game.end(null);
       return;
     }
@@ -266,20 +285,13 @@ public abstract class Microgame extends GamePhase {
             if (user != null) {
               user.giveDefaultAttributes();
             }
-          } else if (getDuration().getSeconds() <= 0) {
+            System.out.println("Es night Ambush, no peierde nadie");
+          } else if (getDuration().equals(Duration.ZERO)) {
             lose(player, false);
+            System.out.println("El tiempo es 0 y perdi");
           }
         }
       );
-
-    if (countNeutralPlayers() == 0) {
-      broadcastMessage(
-        "&c&l» &r&cBad news... There were no winners in this game!"
-      );
-
-      game.end(null);
-      return;
-    }
 
     roundWinners.clear();
 
@@ -307,7 +319,7 @@ public abstract class Microgame extends GamePhase {
   public void win(Player player) {
     User user = userFactory.get(player);
 
-    if (user == null) {
+    if (user == null || player.getGamemode() == Player.SPECTATOR) {
       return;
     }
 
@@ -330,7 +342,7 @@ public abstract class Microgame extends GamePhase {
   public void lose(Player player, boolean teleport) {
     User user = userFactory.get(player);
 
-    if (user == null) {
+    if (user == null || player.getGamemode() == Player.SPECTATOR) {
       return;
     }
 

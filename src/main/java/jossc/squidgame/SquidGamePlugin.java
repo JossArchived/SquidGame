@@ -69,7 +69,7 @@ public class SquidGamePlugin extends Game {
     //Marbles
     //Hopscotch
     phaseSeries.add(new SquidGame(this, Duration.ofMinutes(10)));
-    phaseSeries.add(new EndGamePhase(this, Duration.ofMinutes(10), null));
+    phaseSeries.add(new EndGamePhase(this, Duration.ofSeconds(10), null));
 
     for (State phase : phaseSeries) {
       if (!(phase instanceof Microgame)) {
