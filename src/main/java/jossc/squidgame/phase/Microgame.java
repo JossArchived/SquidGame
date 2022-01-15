@@ -61,6 +61,23 @@ public abstract class Microgame extends GamePhase {
 
   @Override
   protected void onStart() {
+    getNeutralPlayers()
+      .forEach(
+        player -> {
+          User user = userFactory.get(player);
+
+          if (user != null) {
+            user.giveDefaultAttributes();
+            user.sendBossBar(
+              TextFormat.BOLD.toString() +
+              TextFormat.DARK_GREEN +
+              "PREPARING MICROGAME",
+              100
+            );
+          }
+        }
+      );
+
     schedule(
       () -> {
         String instruction = getInstruction();
@@ -87,12 +104,17 @@ public abstract class Microgame extends GamePhase {
   @Override
   public void onUpdate() {
     if (canStartCountdown && startCountdown >= 0) {
-      broadcastBossbar("&bAlive players &l" + countNeutralPlayers(), 100f);
+      broadcastBossbar(
+        "Alive players &b&l" +
+        countNeutralPlayers() +
+        "&r Starting in &b&l" +
+        startCountdown,
+        100
+      );
 
       startCountdown--;
 
       if (startCountdown == 10 || startCountdown <= 5 && startCountdown > 0) {
-        broadcastActionBar("&fStarting in &b&l" + startCountdown + "&r!");
         broadcastMessage(
           "&b&l» &r&fThis microgame will starts in &b" + startCountdown + "&f!"
         );
@@ -141,9 +163,9 @@ public abstract class Microgame extends GamePhase {
 
     if (onGameStartWasCalled) {
       broadcastBossbar(
-        "&bThis microgame ends in &l" +
+        "&bTHIS MICROGAME ENDS IN &l" +
         TimeUtils.timeToString((int) getRemainingDuration().getSeconds()),
-        100f
+        100
       );
       onGameUpdate();
     }
@@ -235,9 +257,20 @@ public abstract class Microgame extends GamePhase {
       return;
     }
 
-    if (!(this instanceof NightAmbush)) {
-      getRoundLosers().forEach(player -> lose(player, false));
-    }
+    getRoundLosers()
+      .forEach(
+        player -> {
+          if (this instanceof NightAmbush) {
+            User user = userFactory.get(player);
+
+            if (user != null) {
+              user.giveDefaultAttributes();
+            }
+          } else if (getDuration().getSeconds() <= 0) {
+            lose(player, false);
+          }
+        }
+      );
 
     if (countNeutralPlayers() == 0) {
       broadcastMessage(

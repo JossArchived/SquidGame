@@ -13,6 +13,7 @@ import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.map.WaitingRoomMap;
 import net.josscoder.gameapi.phase.GamePhase;
 import net.josscoder.gameapi.phase.PhaseSeries;
+import net.josscoder.gameapi.phase.base.EndGamePhase;
 import net.josscoder.gameapi.util.VectorUtils;
 import net.minikloon.fsmgasm.State;
 
@@ -62,12 +63,13 @@ public class SquidGamePlugin extends Game {
 
     phaseSeries.addAll(lobbyPhases);
     phaseSeries.add(new RedLightGreenLight(this, Duration.ofMinutes(5)));
-    phaseSeries.add(new SugarHoneycombs(this, Duration.ofMinutes(3)));
+    phaseSeries.add(new SugarHoneycombs(this, Duration.ofMinutes(2)));
     phaseSeries.add(new NightAmbush(this, Duration.ofMinutes(2)));
     //TugOfWar
     //Marbles
     //Hopscotch
     phaseSeries.add(new SquidGame(this, Duration.ofMinutes(10)));
+    phaseSeries.add(new EndGamePhase(this, Duration.ofMinutes(10), null));
 
     for (State phase : phaseSeries) {
       if (!(phase instanceof Microgame)) {

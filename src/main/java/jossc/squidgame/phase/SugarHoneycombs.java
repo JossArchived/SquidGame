@@ -1,88 +1,52 @@
 package jossc.squidgame.phase;
 
+import cn.nukkit.Player;
+import cn.nukkit.block.Block;
+import cn.nukkit.block.BlockAir;
 import cn.nukkit.entity.Entity;
+import cn.nukkit.entity.projectile.EntityArrow;
+import cn.nukkit.event.EventHandler;
+import cn.nukkit.event.EventPriority;
+import cn.nukkit.event.entity.EntityDamageEvent;
+import cn.nukkit.event.entity.ProjectileHitEvent;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemArrow;
 import cn.nukkit.item.ItemID;
+import cn.nukkit.item.enchantment.Enchantment;
+import cn.nukkit.level.MovingObjectPosition;
+import cn.nukkit.level.Position;
+import cn.nukkit.level.Sound;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.nbt.tag.DoubleTag;
-import cn.nukkit.nbt.tag.FloatTag;
-import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.protocol.LevelSoundEventPacket;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
+import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
-import jossc.squidgame.entity.EntityBurningNeedleSnowball;
-import jossc.squidgame.map.RedLightGreenLightMap;
 import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.customitem.CustomItem;
 import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.user.User;
+import net.josscoder.gameapi.user.storage.LocalStorage;
 import net.josscoder.gameapi.util.VectorUtils;
 
 public class SugarHoneycombs extends Microgame {
 
   private CustomItem burningNeedle;
+  private boolean canReciveDamage = false;
 
   public SugarHoneycombs(Game game, Duration duration) {
     super(game, duration);
-    Entity.registerEntity(
-      "EntityBurningNeedleSnowball",
-      EntityBurningNeedleSnowball.class,
-      true
-    );
-
     registerBurningNeedleItem();
   }
 
   private void registerBurningNeedleItem() {
     burningNeedle =
-      new CustomItem(
-        Item.get(ItemID.BOW),
-        "&6Burning Needle",
-        (
-          (user, player) -> {
-            Vector3 directionVector = player.getDirectionVector();
-
-            CompoundTag nbt = new CompoundTag()
-              .putList(
-                new ListTag<DoubleTag>("Pos")
-                  .add(new DoubleTag("", player.x))
-                  .add(new DoubleTag("", player.y + player.getEyeHeight()))
-                  .add(new DoubleTag("", player.z))
-              )
-              .putList(
-                new ListTag<DoubleTag>("Motion")
-                  .add(new DoubleTag("", directionVector.x))
-                  .add(new DoubleTag("", directionVector.y))
-                  .add(new DoubleTag("", directionVector.z))
-              )
-              .putList(
-                new ListTag<FloatTag>("Rotation")
-                  .add(new FloatTag("", (float) player.yaw))
-                  .add(new FloatTag("", (float) player.pitch))
-              );
-
-            EntityBurningNeedleSnowball projectile = new EntityBurningNeedleSnowball(
-              player
-                .getLevel()
-                .getChunk(player.getFloorX() >> 4, player.getFloorZ() >> 4),
-              nbt,
-              user,
-              this
-            );
-
-            projectile.setMotion(projectile.getMotion().multiply(1.5f));
-
-            projectile.spawnToAll();
-            player
-              .getLevel()
-              .addLevelSoundEvent(player, LevelSoundEventPacket.SOUND_LAVA_POP);
-          }
-        )
-      );
+      new CustomItem(Item.get(ItemID.BOW), "&r&6&lBurning Needle");
+    burningNeedle.addEnchantment(
+      Enchantment.getEnchantment(Enchantment.ID_BOW_INFINITY)
+    );
+    burningNeedle.setTransferable(false);
   }
 
   @Override
@@ -119,6 +83,7 @@ public class SugarHoneycombs extends Microgame {
   @Override
   public void onGameStart() {
     giveBurningNeedle();
+    canReciveDamage = true;
   }
 
   private void giveBurningNeedle() {
@@ -126,6 +91,7 @@ public class SugarHoneycombs extends Microgame {
       .forEach(
         player -> {
           player.getInventory().setItem(0, burningNeedle.build());
+          player.getInventory().setItem(9, new ItemArrow());
 
           User user = userFactory.get(player);
 
@@ -137,8 +103,130 @@ public class SugarHoneycombs extends Microgame {
   }
 
   @Override
-  public void onGameUpdate() {}
+  public void onGameUpdate() {
+    getNeutralPlayers()
+      .forEach(
+        player -> {
+          User user = userFactory.get(player);
+
+          if (user != null) {
+            player.sendActionBar(
+              TextFormat.colorize("&6Blocks broken &l") +
+              user.getLocalStorage().getInteger("blocks_broken")
+            );
+          }
+        }
+      );
+  }
+
+  @EventHandler(priority = EventPriority.HIGHEST)
+  public void onHit(ProjectileHitEvent event) {
+    Entity entity = event.getEntity();
+
+    if (!(entity instanceof EntityArrow)) {
+      return;
+    }
+
+    Entity shootingEntity = ((EntityArrow) entity).shootingEntity;
+
+    if (!(shootingEntity instanceof Player)) {
+      return;
+    }
+
+    Player player = (Player) shootingEntity;
+
+    if (!(entity.isCollided && ((EntityArrow) entity).hadCollision)) {
+      return;
+    }
+
+    entity.close();
+
+    MovingObjectPosition position = event.getMovingObjectPosition();
+
+    Block block = entity
+      .getLevel()
+      .getBlock(
+        new Position(position.blockX, position.blockY, position.blockZ)
+        .add(0, 0, 1)
+      );
+
+    if (block == null || block.getId() == Block.AIR) {
+      return;
+    }
+
+    if (block.getId() == Block.STAINED_HARDENED_CLAY) {
+      User user = userFactory.get(player);
+
+      if (user != null) {
+        player.getLevel().setBlock(block, new BlockAir(), false, true);
+
+        user.playSound("random.levelup", 2, 3);
+
+        LocalStorage storage = user.getLocalStorage();
+
+        storage.set("blocks_broken", storage.getInteger("blocks_broken") + 1);
+
+        user.sendMessage("&l&6» +1 point");
+
+        if (storage.getInteger("blocks_broken") >= 5) {
+          win(player);
+        }
+      }
+    } else {
+      if (
+        !game
+          .callEvent(
+            new EntityDamageEvent(
+              player,
+              EntityDamageEvent.DamageCause.PROJECTILE,
+              1
+            )
+          )
+          .isCancelled()
+      ) {
+        player.setHealth(player.getHealth() - 1);
+        player.getLevel().addSound(player, Sound.GAME_PLAYER_HURT);
+      }
+    }
+  }
 
   @Override
-  public void onGameEnd() {}
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onDamage(EntityDamageEvent event) {
+    if (
+      !canReciveDamage ||
+      !event.getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE)
+    ) {
+      super.onDamage(event);
+
+      return;
+    }
+
+    Entity entity = event.getEntity();
+
+    if (!(entity instanceof Player)) {
+      return;
+    }
+
+    Player player = (Player) entity;
+
+    User user = userFactory.get(player);
+
+    if (user == null) {
+      return;
+    }
+
+    if (event.getFinalDamage() < entity.getHealth()) {
+      return;
+    }
+
+    event.setCancelled();
+
+    lose(player, true);
+  }
+
+  @Override
+  public void onGameEnd() {
+    canReciveDamage = false;
+  }
 }
