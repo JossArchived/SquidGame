@@ -150,7 +150,8 @@ public abstract class Microgame extends GamePhase {
     } else if (onGameStartWasCalled) {
       int reamingDurationToSeconds = (int) getRemainingDuration().getSeconds();
 
-      if (reamingDurationToSeconds == 20 ||
+      if (
+        reamingDurationToSeconds == 20 ||
         reamingDurationToSeconds == 15 ||
         reamingDurationToSeconds == 10 ||
         reamingDurationToSeconds <= 5 &&

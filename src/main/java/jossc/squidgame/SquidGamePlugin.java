@@ -1,5 +1,6 @@
 package jossc.squidgame;
 
+import cn.nukkit.Player;
 import cn.nukkit.utils.ConfigSection;
 import cn.nukkit.utils.TextFormat;
 import java.io.File;
@@ -141,6 +142,16 @@ public class SquidGamePlugin extends Game {
       );
 
     gameMapManager.addMap(roomMap);
+  }
+
+  @Override
+  public void searchNewGameFor(Player player) {
+    player.sendMessage("Sending packet...");
+  }
+
+  @Override
+  public void sendToTheGameCenter(Player player) {
+    player.sendMessage("Sending packet...");
   }
 
   public File skinDataPathToFile() {
