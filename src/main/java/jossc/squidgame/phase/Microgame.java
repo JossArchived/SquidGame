@@ -150,14 +150,14 @@ public abstract class Microgame extends GamePhase {
     } else if (onGameStartWasCalled) {
       int reamingDurationToSeconds = (int) getRemainingDuration().getSeconds();
 
-      if (
+      if (reamingDurationToSeconds == 20 ||
         reamingDurationToSeconds == 15 ||
         reamingDurationToSeconds == 10 ||
         reamingDurationToSeconds <= 5 &&
         reamingDurationToSeconds > 0
       ) {
         broadcastMessage(
-          "&c&l» &r&fThis microgame will ends in &b" +
+          "&c&l» &r&fThis microgame will ends in &c" +
           reamingDurationToSeconds +
           "&f!"
         );
@@ -224,9 +224,7 @@ public abstract class Microgame extends GamePhase {
     return (
       super.isReadyToEnd() ||
       countNeutralPlayers() <= 1 ||
-      countNeutralPlayers() == roundWinners.size() ||
-      countNeutralPlayers() == roundWinners.size() &&
-      microgameCount == ((SquidGamePlugin) game).getMicroGamesCount()
+      countNeutralPlayers() == roundWinners.size()
     );
   }
 
@@ -266,32 +264,22 @@ public abstract class Microgame extends GamePhase {
       } else {
         broadcastMessage("&a&l» &rAll players won this round!");
       }
-    }
+    } else {
+      getRoundLosers()
+        .forEach(
+          player -> {
+            if (this instanceof NightAmbush) {
+              User user = userFactory.get(player);
 
-    if (countNeutralPlayers() == 0) {
-      broadcastMessage(
-        "&c&l» &r&cBad news... There were no winners in this game!"
-      );
-      game.end(null);
-      return;
-    }
-
-    getRoundLosers()
-      .forEach(
-        player -> {
-          if (this instanceof NightAmbush) {
-            User user = userFactory.get(player);
-
-            if (user != null) {
-              user.giveDefaultAttributes();
+              if (user != null) {
+                user.giveDefaultAttributes();
+              }
+            } else if (getRemainingDuration().getSeconds() <= 0) {
+              lose(player, false);
             }
-            System.out.println("Es night Ambush, no peierde nadie");
-          } else if (getDuration().equals(Duration.ZERO)) {
-            lose(player, false);
-            System.out.println("El tiempo es 0 y perdi");
           }
-        }
-      );
+        );
+    }
 
     roundWinners.clear();
 
