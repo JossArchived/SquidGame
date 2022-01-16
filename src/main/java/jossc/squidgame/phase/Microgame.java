@@ -349,6 +349,7 @@ public abstract class Microgame extends GamePhase {
     }
 
     roundWinners.clear();
+    teams.clear();
 
     onGameEnd();
 
