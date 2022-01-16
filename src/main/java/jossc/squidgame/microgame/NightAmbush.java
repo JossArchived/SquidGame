@@ -1,4 +1,4 @@
-package jossc.squidgame.phase;
+package jossc.squidgame.microgame;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;

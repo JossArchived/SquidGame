@@ -1,4 +1,4 @@
-package jossc.squidgame.phase;
+package jossc.squidgame.microgame;
 
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
@@ -185,21 +185,12 @@ public class RedLightGreenLight extends Microgame {
   }
 
   @EventHandler
-  public void onRequestToDeath(PlayerRequestToLoseEvent event) {
-    if (event.getLoseCause() != PlayerRequestToLoseEvent.LoseCause.VOID) {
-      lose(event.getPlayer());
-    }
-  }
-
-  @EventHandler
   public void onMove(PlayerMoveEvent event) {
     if (!(map instanceof RedLightGreenLightMap)) {
       return;
     }
 
     Player player = event.getPlayer();
-
-    Vector3 playerPosition = player.asVector3f().asVector3();
 
     if (
       !isRoundWinner(player) &&
@@ -213,8 +204,7 @@ public class RedLightGreenLight extends Microgame {
     }
 
     if (
-      ((RedLightGreenLightMap) map).isTheGoal(playerPosition) &&
-      !isRoundWinner(player)
+      ((RedLightGreenLightMap) map).isTheGoal(player) && !isRoundWinner(player)
     ) {
       win(player);
     }

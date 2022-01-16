@@ -1,4 +1,4 @@
-package jossc.squidgame.phase;
+package jossc.squidgame.microgame;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
@@ -154,7 +154,7 @@ public class SugarHoneycombs extends Microgame {
     );
 
     for (Block block : blocksAround) {
-      if (block == null) {
+      if (block == null || block.getId() == Item.AIR) {
         continue;
       }
 
@@ -173,7 +173,7 @@ public class SugarHoneycombs extends Microgame {
 
           storage.set("blocks_broken", storage.getInteger("blocks_broken") + 1);
 
-          user.sendMessage("&l&6» +1 point");
+          user.sendMessage("&l&a» +1 point");
 
           if (storage.getInteger("blocks_broken") >= 5) {
             win(player);

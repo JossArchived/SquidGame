@@ -1,4 +1,4 @@
-package jossc.squidgame.phase;
+package jossc.squidgame.microgame;
 
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
@@ -22,8 +22,8 @@ import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 import jossc.squidgame.SquidGamePlugin;
-import jossc.squidgame.team.ITeam;
-import jossc.squidgame.team.Team;
+import jossc.squidgame.microgame.team.ITeam;
+import jossc.squidgame.microgame.team.Team;
 import lombok.Getter;
 import lombok.Setter;
 import net.josscoder.gameapi.Game;
@@ -95,6 +95,20 @@ public abstract class Microgame extends GamePhase {
     return false;
   }
 
+  public static int calculateTimeToReadString(String text) {
+    String[] list = text.split(" ");
+
+    int time = 0;
+
+    for (int i = 0; i <= list.length; i++) {
+      if (i % 3 == 0) {
+        time++;
+      }
+    }
+
+    return time;
+  }
+
   @Override
   protected void onStart() {
     if (isTeam()) {
@@ -102,10 +116,10 @@ public abstract class Microgame extends GamePhase {
       addTeam(new Team(BLUE));
     }
 
+    String instruction = getInstruction();
+
     schedule(
       () -> {
-        String instruction = getInstruction();
-
         if (instruction.isEmpty()) {
           return;
         }
@@ -122,7 +136,11 @@ public abstract class Microgame extends GamePhase {
       20 * 4
     );
 
-    schedule(() -> canStartCountdown = true, 20 * 7);
+    schedule(
+      () -> canStartCountdown = true,
+      20 *
+      (4 + (instruction.isEmpty() ? 3 : calculateTimeToReadString(instruction)))
+    );
   }
 
   @Override

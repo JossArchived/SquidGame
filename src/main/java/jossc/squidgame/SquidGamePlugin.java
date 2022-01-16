@@ -7,7 +7,7 @@ import java.io.File;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
-import jossc.squidgame.phase.*;
+import jossc.squidgame.microgame.*;
 import lombok.Getter;
 import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.map.GameMap;
@@ -67,7 +67,7 @@ public class SquidGamePlugin extends Game {
     phaseSeries.add(new SugarHoneycombs(this, Duration.ofMinutes(2)));
     phaseSeries.add(new NightAmbush(this, Duration.ofMinutes(2)));
     phaseSeries.add(new TugOfWar(this, Duration.ofMinutes(4)));
-    //Marbles
+    phaseSeries.add(new Marbles(this, Duration.ofMinutes(5)));
     //Hopscotch
     phaseSeries.add(new SquidGame(this, Duration.ofMinutes(5)));
     phaseSeries.add(new EndGamePhase(this, Duration.ofSeconds(10), null));

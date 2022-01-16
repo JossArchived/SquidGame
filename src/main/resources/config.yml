@@ -50,3 +50,12 @@ maps:
         "4": "0:100:0"
         "5": "0:100:0"
         "6": "0:100:0"
+  marblesMap:
+    name: "squidGame"
+    safeSpawn: "0:100:0"
+    odd:
+      cornerOne: "0:1000"
+      cornerTwo: "0:100:0"
+    pair:
+      cornerOne: "0:100:0"
+      cornerTwo: "0:!00:0"
