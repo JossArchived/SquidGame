@@ -150,7 +150,7 @@ public class SugarHoneycombs extends Microgame {
         position.blockZ,
         player.getLevel()
       ),
-      2
+      1
     );
 
     for (Block block : blocksAround) {
@@ -158,7 +158,10 @@ public class SugarHoneycombs extends Microgame {
         continue;
       }
 
-      if (block.getId() == Block.STAINED_HARDENED_CLAY) {
+      if (
+        block.getId() == Block.STAINED_HARDENED_CLAY ||
+        block.getId() == Block.CLAY_BLOCK
+      ) {
         User user = userFactory.get(player);
 
         if (user != null) {
