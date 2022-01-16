@@ -150,7 +150,7 @@ public class SugarHoneycombs extends Microgame {
         position.blockZ,
         player.getLevel()
       ),
-      1
+      2
     );
 
     for (Block block : blocksAround) {

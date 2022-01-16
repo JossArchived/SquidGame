@@ -84,7 +84,7 @@
         <dependency>
             <groupId>com.github.Josscoder</groupId>
             <artifactId>GameAPI</artifactId>
-            <version>ac82427739</version>
+            <version>048f153253</version>
         </dependency>
 
     </dependencies>

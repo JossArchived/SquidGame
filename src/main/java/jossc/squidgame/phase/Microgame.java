@@ -22,6 +22,8 @@ import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 import jossc.squidgame.SquidGamePlugin;
+import jossc.squidgame.team.ITeam;
+import jossc.squidgame.team.Team;
 import lombok.Getter;
 import lombok.Setter;
 import net.josscoder.gameapi.Game;
@@ -33,6 +35,8 @@ import net.josscoder.gameapi.util.MathUtils;
 import net.josscoder.gameapi.util.TimeUtils;
 
 public abstract class Microgame extends GamePhase {
+
+  public static String RED = "Red", BLUE = "Blue";
 
   public static final TextFormat[] colors = new TextFormat[] {
     TextFormat.GREEN,
@@ -55,6 +59,9 @@ public abstract class Microgame extends GamePhase {
   @Getter
   protected GameMap map = null;
 
+  @Getter
+  protected final Map<String, Team> teams = new HashMap<>();
+
   public Microgame(Game game, Duration duration) {
     this(game, duration, 0);
   }
@@ -66,8 +73,35 @@ public abstract class Microgame extends GamePhase {
     setupMap(game.getConfig());
   }
 
+  public void addTeam(Team team) {
+    teams.put(team.getId(), team);
+  }
+
+  public boolean isTeam() {
+    return this instanceof ITeam;
+  }
+
+  public boolean isTeamMember(Player from, Player to) {
+    if (!isTeam()) {
+      return false;
+    }
+
+    for (Team team : teams.values()) {
+      if (team.contains(from) && team.contains(to)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   @Override
   protected void onStart() {
+    if (isTeam()) {
+      addTeam(new Team(RED));
+      addTeam(new Team(BLUE));
+    }
+
     schedule(
       () -> {
         String instruction = getInstruction();
@@ -111,20 +145,42 @@ public abstract class Microgame extends GamePhase {
         broadcastSound("note.bassattack", 2, 2);
 
         if (startCountdown == 5 && map != null) {
-          if (map.getSpawns().isEmpty()) {
-            getOnlinePlayers()
+          if (isTeam()) {
+            teams
+              .values()
               .forEach(
-                player -> {
-                  player.setImmobile();
-                  map.teleportToSafeSpawn(player);
-                }
+                team ->
+                  team
+                    .getMembers()
+                    .forEach(
+                      player -> {
+                        List<Vector3> spawns = map.getSpawns(team.getId());
+                        Set<Integer> spawnsUsed = new HashSet<>();
+
+                        spawnPlayer(player, map, spawns, spawnsUsed);
+                      }
+                    )
               );
           } else {
-            List<Vector3> spawns = map.getSpawns();
-            Set<Integer> spawnsUsed = new HashSet<>();
+            if (map.getSpawns().isEmpty()) {
+              getOnlinePlayers()
+                .forEach(
+                  player -> {
+                    player.setImmobile();
+                    map.teleportToSafeSpawn(player);
+                  }
+                );
+            } else {
+              List<Vector3> spawns = map.getSpawns();
+              Set<Integer> spawnsUsed = new HashSet<>();
 
-            getNeutralPlayers()
-              .forEach(player -> spawnPlayer(player, map, spawns, spawnsUsed));
+              getNeutralPlayers()
+                .forEach(
+                  player -> {
+                    spawnPlayer(player, map, spawns, spawnsUsed);
+                  }
+                );
+            }
           }
         }
 
@@ -220,6 +276,16 @@ public abstract class Microgame extends GamePhase {
     spawnsUsed.add(i);
   }
 
+  public boolean thereIsATeamWithoutMembers() {
+    for (Team team : teams.values()) {
+      if (team.countMembers() <= 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   @Override
   public boolean isReadyToEnd() {
     return (
@@ -269,7 +335,7 @@ public abstract class Microgame extends GamePhase {
       getRoundLosers()
         .forEach(
           player -> {
-            if (this instanceof NightAmbush) {
+            if (this instanceof NightAmbush || isTeam()) {
               User user = userFactory.get(player);
 
               if (user != null) {
@@ -347,10 +413,46 @@ public abstract class Microgame extends GamePhase {
     user.convertSpectator(true, false);
   }
 
+  public Team getTeam(Player player) {
+    for (Team team : teams.values()) {
+      if (team.contains(player)) {
+        return team;
+      }
+    }
+
+    return null;
+  }
+
+  public List<Team> getSortedTeams(boolean asc) {
+    return teams
+      .values()
+      .stream()
+      .sorted(
+        Comparator.comparing(
+          Team::countMembers,
+          asc ? Comparator.naturalOrder() : Comparator.reverseOrder()
+        )
+      )
+      .collect(Collectors.toList());
+  }
+
   private void giveArmor(Player player) {
     PlayerInventory inventory = player.getInventory();
 
-    DyeColor color = DyeColor.GREEN;
+    DyeColor color =
+      (
+        isTeam()
+          ? (
+            getTeam(player) == null
+              ? DyeColor.GREEN
+              : (
+                getTeam(player).getId().equalsIgnoreCase(RED)
+                  ? DyeColor.RED
+                  : DyeColor.BLUE
+              )
+          )
+          : DyeColor.GREEN
+      );
 
     ItemChestplateLeather chestPlateLeather = new ItemChestplateLeather();
     chestPlateLeather.setColor(color);
