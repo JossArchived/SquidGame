@@ -68,7 +68,7 @@ public class SquidGamePlugin extends Game {
     phaseSeries.add(new NightAmbush(this, Duration.ofMinutes(2)));
     phaseSeries.add(new TugOfWar(this, Duration.ofMinutes(4)));
     phaseSeries.add(new Marbles(this, Duration.ofMinutes(5)));
-    //Hopscotch
+    phaseSeries.add(new Hopscotch(this, Duration.ofMinutes(10)));
     phaseSeries.add(new SquidGame(this, Duration.ofMinutes(5)));
     phaseSeries.add(new EndGamePhase(this, Duration.ofSeconds(10), null));
 
@@ -77,7 +77,7 @@ public class SquidGamePlugin extends Game {
         continue;
       }
 
-      ((Microgame) phase).setMicrogameCount(microGamesCount + 1);
+      ((Microgame) phase).setOrder(microGamesCount + 1);
 
       microGamesCount++;
     }

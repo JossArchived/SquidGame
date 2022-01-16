@@ -51,7 +51,7 @@ public abstract class Microgame extends GamePhase {
   protected int startCountdown = 11;
 
   @Setter
-  protected int microgameCount;
+  protected int order;
 
   private final List<Player> roundWinners = new ArrayList<>();
 
@@ -66,9 +66,9 @@ public abstract class Microgame extends GamePhase {
     this(game, duration, 0);
   }
 
-  public Microgame(Game game, Duration duration, int microgameCount) {
+  public Microgame(Game game, Duration duration, int order) {
     super(game, duration);
-    this.microgameCount = microgameCount;
+    this.order = order;
 
     setupMap(game.getConfig());
   }
@@ -125,12 +125,7 @@ public abstract class Microgame extends GamePhase {
         }
 
         broadcastMessage(
-          "&b#" +
-          microgameCount +
-          " &7" +
-          getName() +
-          " &e&l» &r&f" +
-          instruction
+          "&b#" + order + " &7" + getName() + " &e&l» &r&f" + instruction
         );
       },
       20 * 4
@@ -158,7 +153,7 @@ public abstract class Microgame extends GamePhase {
 
       if (startCountdown == 10 || startCountdown <= 5 && startCountdown > 0) {
         broadcastMessage(
-          "&b&l» &r&fThis microgame will starts in &b" + startCountdown + "&f!"
+          "&b&l» &r&fThis game will starts in &b" + startCountdown + "&f!"
         );
         broadcastSound("note.bassattack", 2, 2);
 
@@ -232,7 +227,7 @@ public abstract class Microgame extends GamePhase {
         reamingDurationToSeconds > 0
       ) {
         broadcastMessage(
-          "&c&l» &r&fThis microgame will ends in &c" +
+          "&c&l» &r&fThis game will ends in &c" +
           reamingDurationToSeconds +
           "&f!"
         );
@@ -240,7 +235,7 @@ public abstract class Microgame extends GamePhase {
       }
 
       broadcastBossbar(
-        "&l&fTHIS MICROGAME ENDS IN &b" +
+        "&l&fTHIS GAME ENDS IN &b" +
         TimeUtils.timeToString(reamingDurationToSeconds),
         100
       );
@@ -254,7 +249,7 @@ public abstract class Microgame extends GamePhase {
             user.sendBossBar(
               TextFormat.BOLD.toString() +
               colors[MathUtils.nextInt(0, colors.length - 1)] +
-              "PREPARING MICROGAME",
+              "PREPARING GAME",
               100
             );
           }
@@ -343,7 +338,7 @@ public abstract class Microgame extends GamePhase {
     }
 
     if (countNeutralPlayers() == roundWinners.size()) {
-      if (microgameCount == ((SquidGamePlugin) game).getMicroGamesCount()) {
+      if (order == ((SquidGamePlugin) game).getMicroGamesCount()) {
         broadcastMessage("&c&l» &r&cBad news... There was a tie!");
         game.end(null);
       } else {
