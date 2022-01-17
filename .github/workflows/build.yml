@@ -5,7 +5,7 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: contains(github.event.head_commit.message, '[build]')
+    if: contains(github.event.head_commit.message, 'build:')
     steps:
 
       - uses: actions/checkout@v2
@@ -35,7 +35,7 @@ jobs:
   prepare-release:
     runs-on: ubuntu-latest
     needs: [build]
-    if: contains(github.event.head_commit.message, '[build]')
+    if: contains(github.event.head_commit.message, 'build:')
     steps:
       - uses: actions/checkout@v2
 
