@@ -145,11 +145,11 @@ public class SugarHoneycombs extends Microgame {
 
     List<Block> blocksAround = BlockUtils.getNearbyBlocks(
       new Position(
-        position.blockX + 1,
+        position.blockX,
         position.blockY,
-        position.blockZ + 1,
+        position.blockZ,
         player.getLevel()
-      ),
+      ).floor(),
       1
     );
 
