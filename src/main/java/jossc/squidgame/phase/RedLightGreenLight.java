@@ -8,20 +8,18 @@ import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
-import cn.nukkit.utils.TextFormat;
-import java.time.Duration;
-import java.util.function.Predicate;
 import jossc.squidgame.SquidGamePlugin;
 import jossc.squidgame.map.RedLightGreenLightMap;
 import lombok.Getter;
-import lombok.NonNull;
 import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.user.User;
 import net.josscoder.gameapi.util.MathUtils;
 import net.josscoder.gameapi.util.VectorUtils;
 import org.citizen.attributes.CitizenSkin;
-import org.citizen.attributes.InvokeAttribute;
 import org.citizen.entity.Citizen;
+
+import java.time.Duration;
+import java.util.function.Predicate;
 
 public class RedLightGreenLight extends Microgame {
 
@@ -89,14 +87,6 @@ public class RedLightGreenLight extends Microgame {
       )
     );
     doll.setScale(3.5f);
-    doll.setInvokeAttribute(
-      new InvokeAttribute(doll) {
-        @Override
-        public void invoke(@NonNull Player player) {
-          player.sendMessage(TextFormat.RED + "Do not touch me....");
-        }
-      }
-    );
     doll.lookAt(map.getSafeSpawn());
 
     game.getCitizenLibrary().getFactory().add(doll);
