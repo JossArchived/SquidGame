@@ -1,4 +1,4 @@
-package jossc.squidgame.microgame;
+package jossc.squidgame.phase;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import jossc.squidgame.map.HopscotchMap;
-import jossc.squidgame.map.crystal.Crystal;
-import jossc.squidgame.map.crystal.CrystalSection;
+import jossc.squidgame.map.feature.crystal.Crystal;
+import jossc.squidgame.map.feature.crystal.CrystalSection;
 import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.util.VectorUtils;
 

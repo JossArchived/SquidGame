@@ -1,4 +1,4 @@
-package jossc.squidgame.microgame.team;
+package jossc.squidgame.phase.feature.team;
 
 import cn.nukkit.Player;
 import java.util.ArrayList;

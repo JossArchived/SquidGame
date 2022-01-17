@@ -1,4 +1,4 @@
-package jossc.squidgame.microgame;
+package jossc.squidgame.phase;
 
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
@@ -22,8 +22,8 @@ import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 import jossc.squidgame.SquidGamePlugin;
-import jossc.squidgame.microgame.team.ITeam;
-import jossc.squidgame.microgame.team.Team;
+import jossc.squidgame.phase.feature.team.ITeam;
+import jossc.squidgame.phase.feature.team.Team;
 import lombok.Getter;
 import lombok.Setter;
 import net.josscoder.gameapi.Game;

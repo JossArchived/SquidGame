@@ -1,8 +1,8 @@
 package jossc.squidgame.map;
 
 import cn.nukkit.math.Vector3;
-import jossc.squidgame.map.area.OddArea;
-import jossc.squidgame.map.area.PairArea;
+import jossc.squidgame.map.feature.area.OddArea;
+import jossc.squidgame.map.feature.area.PairArea;
 import lombok.Getter;
 import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.map.GameMap;

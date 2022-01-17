@@ -1,4 +1,4 @@
-package jossc.squidgame.map.crystal;
+package jossc.squidgame.map.feature.crystal;
 
 import cn.nukkit.math.Vector3;
 import lombok.Getter;

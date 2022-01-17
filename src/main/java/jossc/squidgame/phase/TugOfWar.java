@@ -1,4 +1,4 @@
-package jossc.squidgame.microgame;
+package jossc.squidgame.phase;
 
 import cn.nukkit.Player;
 import cn.nukkit.entity.Entity;
@@ -15,8 +15,8 @@ import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
-import jossc.squidgame.microgame.team.ITeam;
-import jossc.squidgame.microgame.team.Team;
+import jossc.squidgame.phase.feature.team.ITeam;
+import jossc.squidgame.phase.feature.team.Team;
 import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.util.VectorUtils;

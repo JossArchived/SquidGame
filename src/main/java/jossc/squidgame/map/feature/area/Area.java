@@ -1,4 +1,4 @@
-package jossc.squidgame.map.area;
+package jossc.squidgame.map.feature.area;
 
 import cn.nukkit.math.Vector3;
 import lombok.AllArgsConstructor;

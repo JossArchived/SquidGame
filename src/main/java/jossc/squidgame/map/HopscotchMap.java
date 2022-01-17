@@ -2,8 +2,8 @@ package jossc.squidgame.map;
 
 import cn.nukkit.math.Vector3;
 import java.util.List;
-import jossc.squidgame.map.crystal.Crystal;
-import jossc.squidgame.map.crystal.CrystalSection;
+import jossc.squidgame.map.feature.crystal.Crystal;
+import jossc.squidgame.map.feature.crystal.CrystalSection;
 import lombok.Getter;
 import lombok.Setter;
 import net.josscoder.gameapi.Game;

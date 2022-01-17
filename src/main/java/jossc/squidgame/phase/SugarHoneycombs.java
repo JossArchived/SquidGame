@@ -1,4 +1,4 @@
-package jossc.squidgame.microgame;
+package jossc.squidgame.phase;
 
 import cn.nukkit.Player;
 import cn.nukkit.block.Block;
@@ -149,7 +149,8 @@ public class SugarHoneycombs extends Microgame {
         position.blockY,
         position.blockZ,
         player.getLevel()
-      ).floor(),
+      )
+        .floor(),
       1
     );
 

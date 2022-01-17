@@ -7,7 +7,7 @@ import java.io.File;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
-import jossc.squidgame.microgame.*;
+import jossc.squidgame.phase.*;
 import lombok.Getter;
 import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.map.GameMap;
@@ -41,7 +41,7 @@ public class SquidGamePlugin extends Game {
 
   @Override
   public String getInstruction() {
-    return "You have to complete a series of microgames and the last person standing in the last microgame wins!";
+    return "You have to complete a series of games and the last person standing in the last game wins!";
   }
 
   @Override

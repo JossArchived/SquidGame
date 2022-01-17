@@ -1,4 +1,4 @@
-package jossc.squidgame.microgame;
+package jossc.squidgame.phase;
 
 import cn.nukkit.Player;
 import cn.nukkit.utils.Config;
@@ -8,8 +8,8 @@ import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import jossc.squidgame.map.MarblesMap;
-import jossc.squidgame.map.area.OddArea;
-import jossc.squidgame.map.area.PairArea;
+import jossc.squidgame.map.feature.area.OddArea;
+import jossc.squidgame.map.feature.area.PairArea;
 import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.user.User;
 import net.josscoder.gameapi.user.storage.LocalStorage;

@@ -1,4 +1,4 @@
-package jossc.squidgame.microgame;
+package jossc.squidgame.phase;
 
 import cn.nukkit.Player;
 import cn.nukkit.event.EventHandler;
@@ -16,7 +16,6 @@ import jossc.squidgame.map.RedLightGreenLightMap;
 import lombok.Getter;
 import lombok.NonNull;
 import net.josscoder.gameapi.Game;
-import net.josscoder.gameapi.api.event.user.PlayerRequestToLoseEvent;
 import net.josscoder.gameapi.user.User;
 import net.josscoder.gameapi.util.MathUtils;
 import net.josscoder.gameapi.util.VectorUtils;
