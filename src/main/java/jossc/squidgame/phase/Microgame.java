@@ -18,21 +18,21 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.TextFormat;
-import java.time.Duration;
-import java.util.*;
-import java.util.stream.Collectors;
 import jossc.squidgame.SquidGamePlugin;
 import jossc.squidgame.phase.feature.team.ITeam;
 import jossc.squidgame.phase.feature.team.Team;
 import lombok.Getter;
 import lombok.Setter;
 import net.josscoder.gameapi.Game;
-import net.josscoder.gameapi.api.event.user.UserJoinServerEvent;
 import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.phase.GamePhase;
 import net.josscoder.gameapi.user.User;
 import net.josscoder.gameapi.util.MathUtils;
 import net.josscoder.gameapi.util.TimeUtils;
+
+import java.time.Duration;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class Microgame extends GamePhase {
 
@@ -486,12 +486,6 @@ public abstract class Microgame extends GamePhase {
     if (user != null) {
       user.updateInventory();
     }
-  }
-
-  @EventHandler
-  @Override
-  public void onJoin(UserJoinServerEvent event) {
-    super.onJoin(event);
   }
 
   @EventHandler(priority = EventPriority.HIGHEST)
