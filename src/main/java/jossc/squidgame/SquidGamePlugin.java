@@ -21,9 +21,6 @@ import net.minikloon.fsmgasm.State;
 public class SquidGamePlugin extends Game {
 
   @Getter
-  private static SquidGamePlugin instance;
-
-  @Getter
   private int microGamesCount = 0;
 
   @Getter
@@ -46,8 +43,6 @@ public class SquidGamePlugin extends Game {
 
   @Override
   public void init() {
-    instance = this;
-
     initGameSettings();
 
     if (isDevelopmentMode()) {
@@ -88,7 +83,7 @@ public class SquidGamePlugin extends Game {
   }
 
   private void initGameSettings() {
-    saveResource("config.yml");
+    saveDefaultConfig();
 
     setDevelopmentMode(getConfig().getBoolean("developmentMode"));
     setDefaultGamemode(getConfig().getInt("defaultGamemode"));
