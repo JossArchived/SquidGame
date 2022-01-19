@@ -1,12 +1,13 @@
 package jossc.squidgame;
 
-import cn.nukkit.Player;
 import cn.nukkit.utils.ConfigSection;
+import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.TextFormat;
 import java.io.File;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
+import jossc.squidgame.data.TeamEnum;
 import jossc.squidgame.phase.*;
 import lombok.Getter;
 import net.josscoder.gameapi.Game;
@@ -15,10 +16,15 @@ import net.josscoder.gameapi.map.WaitingRoomMap;
 import net.josscoder.gameapi.phase.GamePhase;
 import net.josscoder.gameapi.phase.PhaseSeries;
 import net.josscoder.gameapi.phase.base.EndGamePhase;
+import net.josscoder.gameapi.team.Team;
+import net.josscoder.gameapi.team.Teamable;
 import net.josscoder.gameapi.util.VectorUtils;
 import net.minikloon.fsmgasm.State;
 
-public class SquidGamePlugin extends Game {
+public class SquidGamePlugin extends Game implements Teamable {
+
+  @Getter
+  private static SquidGamePlugin instance;
 
   @Getter
   private int microGamesCount = 0;
@@ -43,6 +49,8 @@ public class SquidGamePlugin extends Game {
 
   @Override
   public void init() {
+    instance = this;
+
     initGameSettings();
 
     if (isDevelopmentMode()) {
@@ -55,16 +63,16 @@ public class SquidGamePlugin extends Game {
 
     gameMapManager.setMainMap(roomMap);
 
-    List<GamePhase> lobbyPhases = createPreGamePhase();
+    List<GamePhase<Game>> lobbyPhases = createPreGamePhase();
 
     phaseSeries.addAll(lobbyPhases);
-    phaseSeries.add(new RedLightGreenLight(this, Duration.ofMinutes(5)));
-    phaseSeries.add(new SugarHoneycombs(this, Duration.ofMinutes(2)));
-    phaseSeries.add(new NightAmbush(this, Duration.ofMinutes(2)));
-    phaseSeries.add(new TugOfWar(this, Duration.ofMinutes(4)));
-    phaseSeries.add(new Marbles(this, Duration.ofMinutes(5)));
-    phaseSeries.add(new Hopscotch(this, Duration.ofMinutes(10)));
-    phaseSeries.add(new SquidGame(this, Duration.ofMinutes(5)));
+    phaseSeries.add(new RedLightGreenLight(Duration.ofMinutes(5)));
+    phaseSeries.add(new SugarHoneycombs(Duration.ofMinutes(2)));
+    phaseSeries.add(new NightAmbush(Duration.ofMinutes(2)));
+    phaseSeries.add(new TugOfWar(Duration.ofMinutes(4)));
+    phaseSeries.add(new Marbles(Duration.ofMinutes(5)));
+    phaseSeries.add(new Hopscotch(Duration.ofMinutes(10)));
+    phaseSeries.add(new SquidGame(Duration.ofMinutes(5)));
     phaseSeries.add(new EndGamePhase(this, Duration.ofSeconds(10), null));
 
     for (State phase : phaseSeries) {
@@ -86,7 +94,7 @@ public class SquidGamePlugin extends Game {
     saveDefaultConfig();
 
     setDevelopmentMode(getConfig().getBoolean("developmentMode"));
-    setDefaultGamemode(getConfig().getInt("defaultGamemode"));
+    setDefaultPlayerGamemode(getConfig().getInt("defaultGamemode"));
     setMaxPlayers(getConfig().getInt("maxPlayers"));
     setMinPlayers(getConfig().getInt("minPlayers"));
 
@@ -137,16 +145,17 @@ public class SquidGamePlugin extends Game {
       );
 
     gameMapManager.addMap(roomMap);
-  }
 
-  @Override
-  public void searchNewGameFor(Player player) {
-    player.sendMessage("Sending packet...");
-  }
-
-  @Override
-  public void sendToTheGameCenter(Player player) {
-    player.sendMessage("Sending packet...");
+    addTeam(
+      new Team(TeamEnum.RED.getId(), TextFormat.RED.toString(), DyeColor.RED)
+    );
+    addTeam(
+      new Team(
+        TeamEnum.BLUE.getId(),
+        TextFormat.BLUE.toString(),
+        DyeColor.LIGHT_BLUE
+      )
+    );
   }
 
   public File skinDataPathToFile() {

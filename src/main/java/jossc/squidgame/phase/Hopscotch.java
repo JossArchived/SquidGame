@@ -18,15 +18,14 @@ import java.util.Random;
 import jossc.squidgame.map.HopscotchMap;
 import jossc.squidgame.map.feature.crystal.Crystal;
 import jossc.squidgame.map.feature.crystal.CrystalSection;
-import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.util.VectorUtils;
 
 public class Hopscotch extends Microgame {
 
   private boolean canReciveDamage = false;
 
-  public Hopscotch(Game game, Duration duration) {
-    super(game, duration);
+  public Hopscotch(Duration duration) {
+    super(duration);
   }
 
   @Override

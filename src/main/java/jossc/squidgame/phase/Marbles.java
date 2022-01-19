@@ -10,15 +10,14 @@ import java.util.function.Predicate;
 import jossc.squidgame.map.MarblesMap;
 import jossc.squidgame.map.feature.area.OddArea;
 import jossc.squidgame.map.feature.area.PairArea;
-import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.user.User;
 import net.josscoder.gameapi.user.storage.LocalStorage;
 import net.josscoder.gameapi.util.VectorUtils;
 
 public class Marbles extends Microgame {
 
-  public Marbles(Game game, Duration duration) {
-    super(game, duration);
+  public Marbles(Duration duration) {
+    super(duration);
   }
 
   @Override

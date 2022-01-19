@@ -15,18 +15,17 @@ import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
-import jossc.squidgame.phase.feature.team.ITeam;
-import jossc.squidgame.phase.feature.team.Team;
-import net.josscoder.gameapi.Game;
+import jossc.squidgame.data.TeamEnum;
 import net.josscoder.gameapi.map.GameMap;
+import net.josscoder.gameapi.team.Team;
 import net.josscoder.gameapi.util.VectorUtils;
 
-public class TugOfWar extends Microgame implements ITeam {
+public class TugOfWar extends Microgame {
 
   private boolean canReciveDamage = false;
 
-  public TugOfWar(Game game, Duration duration) {
-    super(game, duration);
+  public TugOfWar(Duration duration) {
+    super(duration);
   }
 
   @Override
@@ -44,13 +43,7 @@ public class TugOfWar extends Microgame implements ITeam {
     super.onStart();
 
     getNeutralPlayers()
-      .forEach(
-        player -> {
-          Team sortedTeam = getSortedTeams(true).get(0);
-
-          sortedTeam.add(player);
-        }
-      );
+      .forEach(player -> game.getSortedTeams().get(0).addMember(player));
   }
 
   @Override
@@ -64,8 +57,14 @@ public class TugOfWar extends Microgame implements ITeam {
         VectorUtils.stringToVector(section.getString("safeSpawn"))
       );
 
-    map.setSpawns(RED, getTeamSpawns(section, RED.toLowerCase()));
-    map.setSpawns(BLUE, getTeamSpawns(section, BLUE.toLowerCase()));
+    map.setSpawns(
+      TeamEnum.RED.getId(),
+      getTeamSpawns(section, TeamEnum.RED.getId().toLowerCase())
+    );
+    map.setSpawns(
+      TeamEnum.BLUE.getId(),
+      getTeamSpawns(section, TeamEnum.BLUE.getId().toLowerCase())
+    );
   }
 
   private List<Vector3> getTeamSpawns(ConfigSection section, String id) {
@@ -92,18 +91,15 @@ public class TugOfWar extends Microgame implements ITeam {
           }
           user.updateInventory();
 
-          Team team = getTeam(player);
+          Team team = game.getTeam(player);
 
           if (team != null) {
-            boolean isRed = team.getId().equalsIgnoreCase(RED);
-            String teamColor = "&" + (isRed ? "c" : "9");
-
             player.sendMessage(
               TextFormat.colorize(
                 "&l" +
-                teamColor +
+                team.getColor() +
                 "»&r&f Your team is " +
-                teamColor +
+                team.getColor() +
                 team.getId().toUpperCase()
               )
             );
@@ -153,7 +149,7 @@ public class TugOfWar extends Microgame implements ITeam {
 
       if (
         !(shootingEntity instanceof Player) ||
-        isTeamMember((Player) shootingEntity, player)
+        game.isTeamMember((Player) shootingEntity, player)
       ) {
         super.onDamage(event);
       }
@@ -166,7 +162,7 @@ public class TugOfWar extends Microgame implements ITeam {
 
   @Override
   public boolean isReadyToEnd() {
-    return super.isReadyToEnd() || thereIsATeamWithoutMembers();
+    return super.isReadyToEnd() || game.thereIsATeamWithoutMembers();
   }
 
   @Override

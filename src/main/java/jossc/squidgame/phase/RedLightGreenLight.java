@@ -8,18 +8,15 @@ import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
-import jossc.squidgame.SquidGamePlugin;
+import java.time.Duration;
+import java.util.function.Predicate;
 import jossc.squidgame.map.RedLightGreenLightMap;
 import lombok.Getter;
-import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.user.User;
 import net.josscoder.gameapi.util.MathUtils;
 import net.josscoder.gameapi.util.VectorUtils;
 import org.citizen.attributes.CitizenSkin;
 import org.citizen.entity.Citizen;
-
-import java.time.Duration;
-import java.util.function.Predicate;
 
 public class RedLightGreenLight extends Microgame {
 
@@ -28,8 +25,8 @@ public class RedLightGreenLight extends Microgame {
   @Getter
   private Citizen doll = null;
 
-  public RedLightGreenLight(Game game, Duration duration) {
-    super(game, duration);
+  public RedLightGreenLight(Duration duration) {
+    super(duration);
     generateDoll();
   }
 
@@ -80,11 +77,7 @@ public class RedLightGreenLight extends Microgame {
       Position.fromObject(dollPosition.add(0.5, 1, 0.5), map.toLevel())
     );
     doll.setSkin(
-      CitizenSkin.from(
-        ((SquidGamePlugin) game).skinDataPathToFile()
-          .toPath()
-          .resolve("doll.png")
-      )
+      CitizenSkin.from(game.skinDataPathToFile().toPath().resolve("doll.png"))
     );
     doll.setScale(3.5f);
     doll.lookAt(map.getSafeSpawn());

@@ -7,7 +7,6 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
 import java.time.Duration;
-import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.user.User;
 import net.josscoder.gameapi.util.VectorUtils;
@@ -16,8 +15,8 @@ public class SquidGame extends Microgame {
 
   private boolean canAttack = false;
 
-  public SquidGame(Game game, Duration duration) {
-    super(game, duration);
+  public SquidGame(Duration duration) {
+    super(duration);
   }
 
   @Override

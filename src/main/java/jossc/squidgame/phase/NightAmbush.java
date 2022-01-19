@@ -9,16 +9,14 @@ import cn.nukkit.item.ItemID;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.utils.Config;
 import java.time.Duration;
-import jossc.squidgame.SquidGamePlugin;
-import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.user.User;
 
 public class NightAmbush extends Microgame {
 
   private boolean canAttack = false;
 
-  public NightAmbush(Game game, Duration duration) {
-    super(game, duration);
+  public NightAmbush(Duration duration) {
+    super(duration);
   }
 
   @Override
@@ -33,7 +31,7 @@ public class NightAmbush extends Microgame {
 
   @Override
   public void setupMap(Config config) {
-    map = ((SquidGamePlugin) game).getRoomMap();
+    map = game.getRoomMap();
   }
 
   @Override

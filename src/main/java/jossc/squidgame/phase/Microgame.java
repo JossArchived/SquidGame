@@ -18,25 +18,20 @@ import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.TextFormat;
+import java.time.Duration;
+import java.util.*;
+import java.util.stream.Collectors;
 import jossc.squidgame.SquidGamePlugin;
-import jossc.squidgame.phase.feature.team.ITeam;
-import jossc.squidgame.phase.feature.team.Team;
+import jossc.squidgame.util.ReadUtils;
 import lombok.Getter;
 import lombok.Setter;
-import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.phase.GamePhase;
 import net.josscoder.gameapi.user.User;
 import net.josscoder.gameapi.util.MathUtils;
 import net.josscoder.gameapi.util.TimeUtils;
 
-import java.time.Duration;
-import java.util.*;
-import java.util.stream.Collectors;
-
-public abstract class Microgame extends GamePhase {
-
-  public static String RED = "Red", BLUE = "Blue";
+public abstract class Microgame extends GamePhase<SquidGamePlugin> {
 
   public static final TextFormat[] colors = new TextFormat[] {
     TextFormat.GREEN,
@@ -51,7 +46,7 @@ public abstract class Microgame extends GamePhase {
   protected int startCountdown = 11;
 
   @Setter
-  protected int order;
+  protected int order = 0;
 
   private final List<Player> roundWinners = new ArrayList<>();
 
@@ -59,63 +54,13 @@ public abstract class Microgame extends GamePhase {
   @Getter
   protected GameMap map = null;
 
-  @Getter
-  protected final Map<String, Team> teams = new HashMap<>();
-
-  public Microgame(Game game, Duration duration) {
-    this(game, duration, 0);
-  }
-
-  public Microgame(Game game, Duration duration, int order) {
-    super(game, duration);
-    this.order = order;
-
+  public Microgame(Duration duration) {
+    super(SquidGamePlugin.getInstance(), duration);
     setupMap(game.getConfig());
-  }
-
-  public void addTeam(Team team) {
-    teams.put(team.getId(), team);
-  }
-
-  public boolean isTeam() {
-    return this instanceof ITeam;
-  }
-
-  public boolean isTeamMember(Player from, Player to) {
-    if (!isTeam()) {
-      return false;
-    }
-
-    for (Team team : teams.values()) {
-      if (team.contains(from) && team.contains(to)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  public static int calculateTimeToReadString(String text) {
-    String[] list = text.split(" ");
-
-    int time = 0;
-
-    for (int i = 0; i <= list.length; i++) {
-      if (i % 3 == 0) {
-        time++;
-      }
-    }
-
-    return time;
   }
 
   @Override
   protected void onStart() {
-    if (isTeam()) {
-      addTeam(new Team(RED));
-      addTeam(new Team(BLUE));
-    }
-
     String instruction = getInstruction();
 
     schedule(
@@ -134,7 +79,14 @@ public abstract class Microgame extends GamePhase {
     schedule(
       () -> canStartCountdown = true,
       20 *
-      (4 + (instruction.isEmpty() ? 3 : calculateTimeToReadString(instruction)))
+      (
+        4 +
+        (
+          instruction.isEmpty()
+            ? 3
+            : ReadUtils.calculateTimeToReadString(instruction)
+        )
+      )
     );
   }
 
@@ -158,9 +110,9 @@ public abstract class Microgame extends GamePhase {
         broadcastSound("note.bassattack", 2, 2);
 
         if (startCountdown == 5 && map != null) {
-          if (isTeam()) {
-            teams
-              .values()
+          if (game.isTeamable()) {
+            game
+              .getTeams()
               .forEach(
                 team ->
                   team
@@ -189,9 +141,7 @@ public abstract class Microgame extends GamePhase {
 
               getNeutralPlayers()
                 .forEach(
-                  player -> {
-                    spawnPlayer(player, map, spawns, spawnsUsed);
-                  }
+                  player -> spawnPlayer(player, map, spawns, spawnsUsed)
                 );
             }
           }
@@ -289,16 +239,6 @@ public abstract class Microgame extends GamePhase {
     spawnsUsed.add(i);
   }
 
-  public boolean thereIsATeamWithoutMembers() {
-    for (Team team : teams.values()) {
-      if (team.countMembers() <= 0) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   @Override
   public boolean isReadyToEnd() {
     return (
@@ -338,7 +278,7 @@ public abstract class Microgame extends GamePhase {
     }
 
     if (countNeutralPlayers() == roundWinners.size()) {
-      if (order == ((SquidGamePlugin) game).getMicroGamesCount()) {
+      if (order == game.getMicroGamesCount()) {
         broadcastMessage("&c&l» &r&cBad news... There was a tie!");
         game.end(null);
       } else {
@@ -348,7 +288,7 @@ public abstract class Microgame extends GamePhase {
       getRoundLosers()
         .forEach(
           player -> {
-            if (this instanceof NightAmbush || isTeam()) {
+            if (this instanceof NightAmbush || this instanceof TugOfWar) {
               User user = userFactory.get(player);
 
               if (user != null) {
@@ -362,7 +302,6 @@ public abstract class Microgame extends GamePhase {
     }
 
     roundWinners.clear();
-    teams.clear();
 
     onGameEnd();
 
@@ -427,43 +366,18 @@ public abstract class Microgame extends GamePhase {
     user.convertSpectator(true, false);
   }
 
-  public Team getTeam(Player player) {
-    for (Team team : teams.values()) {
-      if (team.contains(player)) {
-        return team;
-      }
-    }
-
-    return null;
-  }
-
-  public List<Team> getSortedTeams(boolean asc) {
-    return teams
-      .values()
-      .stream()
-      .sorted(
-        Comparator.comparing(
-          Team::countMembers,
-          asc ? Comparator.naturalOrder() : Comparator.reverseOrder()
-        )
-      )
-      .collect(Collectors.toList());
-  }
-
   private void giveArmor(Player player) {
     PlayerInventory inventory = player.getInventory();
 
+    boolean isTugOfWar = (this instanceof TugOfWar);
+
     DyeColor color =
       (
-        isTeam()
+        isTugOfWar
           ? (
-            getTeam(player) == null
+            game.getTeam(player) == null
               ? DyeColor.GREEN
-              : (
-                getTeam(player).getId().equalsIgnoreCase(RED)
-                  ? DyeColor.RED
-                  : DyeColor.BLUE
-              )
+              : (game.getTeam(player).getDyeColor())
           )
           : DyeColor.GREEN
       );

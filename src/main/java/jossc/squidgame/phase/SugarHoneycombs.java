@@ -22,7 +22,6 @@ import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
-import net.josscoder.gameapi.Game;
 import net.josscoder.gameapi.customitem.CustomItem;
 import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.user.User;
@@ -35,8 +34,8 @@ public class SugarHoneycombs extends Microgame {
   private CustomItem burningNeedle;
   private boolean canReciveDamage = false;
 
-  public SugarHoneycombs(Game game, Duration duration) {
-    super(game, duration);
+  public SugarHoneycombs(Duration duration) {
+    super(duration);
     registerBurningNeedleItem();
   }
 
