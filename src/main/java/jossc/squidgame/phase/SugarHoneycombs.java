@@ -80,6 +80,17 @@ public class SugarHoneycombs extends Microgame {
   }
 
   @Override
+  public List<String> getScoreboardLines(User user) {
+    List<String> lines = super.getScoreboardLines(user);
+
+    int blocksBroken = user.getLocalStorage().getInteger("blocks_broken");
+
+    lines.add("\uE19D Blocks broken " + blocksBroken);
+
+    return lines;
+  }
+
+  @Override
   public void onGameStart() {
     giveBurningNeedle();
     canReciveDamage = true;
@@ -102,21 +113,7 @@ public class SugarHoneycombs extends Microgame {
   }
 
   @Override
-  public void onGameUpdate() {
-    getRoundLosers()
-      .forEach(
-        player -> {
-          User user = userFactory.get(player);
-
-          if (user != null) {
-            player.sendActionBar(
-              TextFormat.colorize("&6Blocks broken &l") +
-              user.getLocalStorage().getInteger("blocks_broken")
-            );
-          }
-        }
-      );
-  }
+  public void onGameUpdate() {}
 
   @EventHandler(priority = EventPriority.HIGHEST)
   public void onHit(ProjectileHitEvent event) {

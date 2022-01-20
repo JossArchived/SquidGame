@@ -5,6 +5,7 @@ import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
 import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Predicate;
 import jossc.squidgame.map.MarblesMap;
@@ -27,7 +28,7 @@ public class Marbles extends Microgame {
 
   @Override
   public String getInstruction() {
-    return "Wow you have come so far... In this game we will give you 10 marbles, you have to get 20 marbles to advance, remember that every 10 seconds you will be given a random number, you have to guess, if it is odd or even, remember that if you If you make a mistake, you will lose 1 marble, if you are right, you will win 2 marbles!, if you lose all of them, you will lose...";
+    return "Guess if the number is even or odd to get 20 marbles and win!";
   }
 
   @Override
@@ -56,6 +57,16 @@ public class Marbles extends Microgame {
   }
 
   @Override
+  public List<String> getScoreboardLines(User user) {
+    List<String> lines = super.getScoreboardLines(user);
+
+    int marbles = user.getLocalStorage().getInteger("marbles");
+    lines.add("\uE14E " + marbles);
+
+    return lines;
+  }
+
+  @Override
   public void onGameStart() {
     getNeutralUsers()
       .forEach(user -> user.getLocalStorage().set("marbles", 10));
@@ -75,62 +86,71 @@ public class Marbles extends Microgame {
     return !isInOdd(player) && !isInPair(player);
   }
 
-  private void startThinkingOfANumber() {
-    int actualNumber = ThreadLocalRandom.current().nextInt(1, 10);
+  private void removeMarble(User user) {
+    LocalStorage storage = user.getLocalStorage();
 
-    boolean isPair = (actualNumber % 2) == 0;
+    storage.set("marbles", storage.getInteger("marbles") - 1);
+
+    user.sendMessage("&l&c» -1 point");
+
+    if (storage.getInteger("marbles") <= 0) {
+      lose(user.getPlayer());
+    } else {
+      broadcastSound("block.turtle_egg.drop");
+    }
+  }
+
+  private void addMarble(User user) {
+    LocalStorage storage = user.getLocalStorage();
+
+    storage.set("marbles", storage.getInteger("marbles") + 2);
+
+    user.sendMessage("&l&a» +2 points");
+
+    if (storage.getInteger("marbles") >= 20) {
+      win(user.getPlayer());
+    } else {
+      playSound(user.getPlayer(), "random.levelup", 2, 3);
+    }
+  }
+
+  private void startThinkingOfANumber() {
+    int number = ThreadLocalRandom.current().nextInt(1, 10);
+
+    boolean isPair = (number % 2) == 0;
     String numberToString = (isPair ? "&aPAIR" : "&cODD");
 
     Predicate<? super Player> condition = player -> !isRoundWinner(player);
 
     broadcastMessage(
       "&l&6» &rThe number is " +
-      actualNumber +
+      number +
       "... it's &l" +
       numberToString +
       "&r!",
       condition
     );
     broadcastTitle(
-      "&fThe number is " + actualNumber,
+      "&fThe number is " + number,
       "&fit's &l" + numberToString,
       condition
     );
 
-    getRoundLosers()
-      .forEach(
-        player -> {
-          User user = userFactory.get(player);
+    for (Player loser : getRoundLosers()) {
+      User user = userFactory.get(loser);
 
-          if (user != null) {
-            LocalStorage storage = user.getLocalStorage();
+      if (user == null) {
+        continue;
+      }
 
-            if (isInPair(player) == isPair) {
-              playSound(player, "random.levelup", 2, 3);
-
-              storage.set("marbles", storage.getInteger("marbles") + 2);
-
-              user.sendMessage("&l&a» +2 points");
-
-              if (storage.getInteger("marbles") >= 20) {
-                win(player);
-              }
-            } else {
-              playSound(player, "mob.blaze.hit");
-
-              storage.set("marbles", storage.getInteger("marbles") - 1);
-
-              user.sendMessage("&l&c» -1 point");
-
-              if (storage.getInteger("marbles") <= 0) {
-                lose(player);
-              }
-            }
-
-            map.teleportToSafeSpawn(player);
-          }
-        }
-      );
+      if (isPair && isInPair(loser)) {
+        addMarble(user);
+      } else if (!isPair && isInOdd(loser)) {
+        addMarble(user);
+      } else {
+        removeMarble(user);
+      }
+    }
 
     schedule(this::startThinkingOfANumber, 20 * 10);
   }
@@ -144,15 +164,10 @@ public class Marbles extends Microgame {
 
           if (user != null) {
             player.sendActionBar(
-              TextFormat.colorize("&fMarbles &l&e") +
-              user.getLocalStorage().getInteger("marbles") +
               TextFormat.colorize(
-                " &r&fOption Selected: &l" +
-                (
-                  notInZone(player)
-                    ? "&fNone"
-                    : (isInPair(player) ? "&aPAIR" : "&cODD")
-                )
+                notInZone(player)
+                  ? "&fNone"
+                  : (isInPair(player) ? "&aPAIR" : "&cODD")
               )
             );
           }

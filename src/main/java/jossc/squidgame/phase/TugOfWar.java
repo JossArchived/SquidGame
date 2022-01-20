@@ -18,6 +18,7 @@ import java.util.List;
 import jossc.squidgame.data.TeamEnum;
 import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.team.Team;
+import net.josscoder.gameapi.user.User;
 import net.josscoder.gameapi.util.VectorUtils;
 
 public class TugOfWar extends Microgame {
@@ -67,6 +68,25 @@ public class TugOfWar extends Microgame {
     );
   }
 
+  @Override
+  public List<String> getScoreboardLines(User user) {
+    List<String> lines = super.getScoreboardLines(user);
+
+    Team team = game.getTeam(user.getPlayer());
+
+    if (team != null) {
+      lines.add(
+        (team.getId().equals(TeamEnum.RED.getId()) ? "\uE130" : "\uE131") +
+        " " +
+        team.getColor() +
+        team.getId() +
+        " Team"
+      );
+    }
+
+    return lines;
+  }
+
   private List<Vector3> getTeamSpawns(ConfigSection section, String id) {
     List<Vector3> spawns = new LinkedList<>();
 
@@ -94,13 +114,16 @@ public class TugOfWar extends Microgame {
           Team team = game.getTeam(player);
 
           if (team != null) {
+            String color = team.getColor();
+
             player.sendMessage(
               TextFormat.colorize(
                 "&l" +
-                team.getColor() +
-                "»&r&f Your team is " +
-                team.getColor() +
-                team.getId().toUpperCase()
+                color +
+                "»&r&f Your are on the " +
+                color +
+                team.getId() +
+                " Team!"
               )
             );
           }

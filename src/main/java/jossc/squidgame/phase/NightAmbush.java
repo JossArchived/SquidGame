@@ -7,13 +7,18 @@ import cn.nukkit.event.entity.EntityDamageEvent;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemID;
 import cn.nukkit.potion.Effect;
+import cn.nukkit.scheduler.Task;
 import cn.nukkit.utils.Config;
+import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
+import java.util.List;
 import net.josscoder.gameapi.user.User;
 
 public class NightAmbush extends Microgame {
 
   private boolean canAttack = false;
+
+  private int countdown = 6;
 
   public NightAmbush(Duration duration) {
     super(duration);
@@ -35,18 +40,46 @@ public class NightAmbush extends Microgame {
   }
 
   @Override
+  public List<String> getScoreboardLines(User user) {
+    List<String> lines = super.getScoreboardLines(user);
+
+    lines.add(
+      "\uE114 " +
+      (
+        countdown == 0
+          ? TextFormat.RED + "PvP Enabled"
+          : " Enabling pvp in " + countdown
+      )
+    );
+
+    return lines;
+  }
+
+  @Override
   public void onGameStart() {
     giveWeapons();
     giveEffect();
 
     broadcastMessage("&6&l» &r&fGet safe, pvp is coming soon...");
+    broadcastSound("note.bass", 0.8f, 1);
 
-    schedule(
-      () -> {
-        canAttack = true;
-        broadcastMessage("&c&l» &r&cPvP has been enabled!");
+    scheduleRepeating(
+      new Task() {
+        @Override
+        public void onRun(int i) {
+          if (countdown > 0) {
+            countdown--;
+          }
+
+          if (countdown == 0) {
+            cancel();
+            canAttack = true;
+            broadcastMessage("&c&l» &r&cPvP has been enabled!");
+            broadcastSound("block.turtle_egg.drop", 0.6f, 2);
+          }
+        }
       },
-      20 * 5
+      20
     );
   }
 

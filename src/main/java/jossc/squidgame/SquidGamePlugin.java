@@ -1,8 +1,10 @@
 package jossc.squidgame;
 
+import cn.nukkit.Player;
 import cn.nukkit.utils.ConfigSection;
 import cn.nukkit.utils.DyeColor;
 import cn.nukkit.utils.TextFormat;
+import com.denzelcode.form.FormAPI;
 import java.io.File;
 import java.time.Duration;
 import java.util.List;
@@ -18,6 +20,8 @@ import net.josscoder.gameapi.phase.PhaseSeries;
 import net.josscoder.gameapi.phase.base.EndGamePhase;
 import net.josscoder.gameapi.team.Team;
 import net.josscoder.gameapi.team.Teamable;
+import net.josscoder.gameapi.user.User;
+import net.josscoder.gameapi.user.storage.LocalStorage;
 import net.josscoder.gameapi.util.VectorUtils;
 import net.minikloon.fsmgasm.State;
 
@@ -67,7 +71,7 @@ public class SquidGamePlugin extends Game implements Teamable {
 
     phaseSeries.addAll(lobbyPhases);
     phaseSeries.add(new RedLightGreenLight(Duration.ofMinutes(5)));
-    phaseSeries.add(new SugarHoneycombs(Duration.ofMinutes(2)));
+    phaseSeries.add(new SugarHoneycombs(Duration.ofMinutes(1)));
     phaseSeries.add(new NightAmbush(Duration.ofMinutes(2)));
     phaseSeries.add(new TugOfWar(Duration.ofMinutes(4)));
     phaseSeries.add(new Marbles(Duration.ofMinutes(5)));
@@ -150,16 +154,57 @@ public class SquidGamePlugin extends Game implements Teamable {
       new Team(TeamEnum.RED.getId(), TextFormat.RED.toString(), DyeColor.RED)
     );
     addTeam(
-      new Team(
-        TeamEnum.BLUE.getId(),
-        TextFormat.BLUE.toString(),
-        DyeColor.LIGHT_BLUE
-      )
+      new Team(TeamEnum.BLUE.getId(), TextFormat.BLUE.toString(), DyeColor.BLUE)
     );
   }
 
   public File skinDataPathToFile() {
     return new File(getDataFolder() + "/skin/");
+  }
+
+  @Override
+  public void showGameResume(Player player) {
+    User user = userFactory.get(player);
+
+    if (user == null) {
+      return;
+    }
+
+    super.showGameResume(player);
+
+    LocalStorage localStorage = user.getLocalStorage();
+
+    int roundsWon = localStorage.getInteger("rounds_won");
+    int blocksBroken = localStorage.getInteger("blocks_broken");
+    int marblesTaken = localStorage.getInteger("marbles");
+
+    FormAPI
+      .modalWindowForm(
+        TextFormat.BOLD.toString() + TextFormat.DARK_PURPLE + "            Game Over!",
+        TextFormat.colorize(
+          "&f&lYour game overview:\n\n   &b&l» &r&b" +
+          roundsWon +
+          " Rounds Won\n   &b&l» &r&b" +
+          blocksBroken +
+          " Blocks Broken\n   &b&l» &r&b" +
+          marblesTaken +
+          " Marbles Taken\n\n&rWe'll find a new game shortly.."
+        ),
+        TextFormat.BOLD.toString() + TextFormat.DARK_GRAY + "Close Overview",
+        TextFormat.BOLD.toString() + TextFormat.RED + "Exit to Hub"
+      )
+      .addHandler(
+        event -> {
+          if (event.wasClosed()) {
+            return;
+          }
+
+          if (!event.isAccepted()) {
+            sendToHub(player);
+          }
+        }
+      )
+      .sendTo(player);
   }
 
   @Override

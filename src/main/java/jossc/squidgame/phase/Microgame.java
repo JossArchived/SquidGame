@@ -17,7 +17,6 @@ import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.DyeColor;
-import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,16 +27,11 @@ import lombok.Setter;
 import net.josscoder.gameapi.map.GameMap;
 import net.josscoder.gameapi.phase.GamePhase;
 import net.josscoder.gameapi.user.User;
+import net.josscoder.gameapi.user.storage.LocalStorage;
 import net.josscoder.gameapi.util.MathUtils;
 import net.josscoder.gameapi.util.TimeUtils;
 
 public abstract class Microgame extends GamePhase<SquidGamePlugin> {
-
-  public static final TextFormat[] colors = new TextFormat[] {
-    TextFormat.GREEN,
-    TextFormat.WHITE,
-    TextFormat.DARK_GREEN
-  };
 
   protected boolean onGameStartWasCalled = false;
 
@@ -61,6 +55,8 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
 
   @Override
   protected void onStart() {
+    cleanupNeutralPlayers();
+
     String instruction = getInstruction();
 
     schedule(
@@ -69,9 +65,9 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
           return;
         }
 
-        broadcastMessage(
-          "&b#" + order + " &7" + getName() + " &e&l» &r&f" + instruction
-        );
+        broadcastMessage("&d&l» &e#" + order + "&b " + getName());
+        broadcastMessage("&l&7» &r" + instruction);
+        cleanupNeutralPlayers();
       },
       20 * 4
     );
@@ -90,15 +86,77 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
     );
   }
 
+  private void spawnPlayers() {
+    if (game.isTeamable() && this instanceof TugOfWar) {
+      game
+        .getTeams()
+        .forEach(
+          team ->
+            team
+              .getMembers()
+              .forEach(
+                player -> {
+                  List<Vector3> spawns = map.getSpawns(team.getId());
+                  Set<Integer> spawnsUsed = new HashSet<>();
+
+                  spawnPlayer(player, map, spawns, spawnsUsed);
+                }
+              )
+        );
+    } else {
+      if (map.getSpawns().isEmpty()) {
+        getOnlinePlayers()
+          .forEach(
+            player -> {
+              player.setImmobile();
+              map.teleportToSafeSpawn(player);
+            }
+          );
+      } else {
+        List<Vector3> spawns = map.getSpawns();
+        Set<Integer> spawnsUsed = new HashSet<>();
+
+        getNeutralPlayers()
+          .forEach(player -> spawnPlayer(player, map, spawns, spawnsUsed));
+      }
+    }
+  }
+
+  private void preparePlayers() {
+    getNeutralUsers()
+      .forEach(
+        user -> {
+          Player player = user.getPlayer();
+
+          if (player != null) {
+            player.setImmobile(false);
+            user.giveDefaultAttributes();
+            giveArmor(player);
+          }
+        }
+      );
+  }
+
+  public List<String> getScoreboardLines(User user) {
+    List<String> lines = new ArrayList<>();
+
+    lines.add(
+      "\uE112 Ending in " +
+      TimeUtils.timeToString((int) getRemainingDuration().getSeconds())
+    );
+
+    return lines;
+  }
+
   @Override
   public void onUpdate() {
     if (canStartCountdown && startCountdown >= 0) {
-      broadcastBossbar(
-        "&f&lPLAYERS &b" +
-        countNeutralPlayers() +
-        "&f STARTING IN &b" +
-        startCountdown,
-        100
+      broadcastScoreboard(
+        "",
+        player -> getNeutralPlayers().contains(player),
+        "\uE181 " + order + "/" + game.getMicroGamesCount(),
+        "\uE105 " + countNeutralPlayers(),
+        "\uE142 Starting in " + startCountdown
       );
 
       startCountdown--;
@@ -107,62 +165,17 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
         broadcastMessage(
           "&b&l» &r&fThis game will starts in &b" + startCountdown + "&f!"
         );
-        broadcastSound("note.bassattack", 2, 2);
+        broadcastSound("liquid.lavapop", 0.9f, 1);
 
         if (startCountdown == 5 && map != null) {
-          if (game.isTeamable()) {
-            game
-              .getTeams()
-              .forEach(
-                team ->
-                  team
-                    .getMembers()
-                    .forEach(
-                      player -> {
-                        List<Vector3> spawns = map.getSpawns(team.getId());
-                        Set<Integer> spawnsUsed = new HashSet<>();
-
-                        spawnPlayer(player, map, spawns, spawnsUsed);
-                      }
-                    )
-              );
-          } else {
-            if (map.getSpawns().isEmpty()) {
-              getOnlinePlayers()
-                .forEach(
-                  player -> {
-                    player.setImmobile();
-                    map.teleportToSafeSpawn(player);
-                  }
-                );
-            } else {
-              List<Vector3> spawns = map.getSpawns();
-              Set<Integer> spawnsUsed = new HashSet<>();
-
-              getNeutralPlayers()
-                .forEach(
-                  player -> spawnPlayer(player, map, spawns, spawnsUsed)
-                );
-            }
-          }
+          spawnPlayers();
         }
 
         return;
       }
 
       if (startCountdown == 0) {
-        getNeutralUsers()
-          .forEach(
-            user -> {
-              Player player = user.getPlayer();
-
-              if (player != null) {
-                player.setImmobile(false);
-                user.giveDefaultAttributes();
-                giveArmor(player);
-              }
-            }
-          );
+        preparePlayers();
         onGameStart();
         onGameStartWasCalled = true;
       }
@@ -181,29 +194,24 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
           reamingDurationToSeconds +
           "&f!"
         );
-        broadcastSound("note.bassattack", 2, 2);
+        broadcastSound("liquid.lavapop", 0.9f, 1);
       }
-
-      broadcastBossbar(
-        "&l&fTHIS GAME ENDS IN &b" +
-        TimeUtils.timeToString(reamingDurationToSeconds),
-        100
-      );
-
-      onGameUpdate();
-    } else {
       getNeutralUsers()
         .forEach(
           user -> {
-            user.giveDefaultAttributes();
-            user.sendBossBar(
-              TextFormat.BOLD.toString() +
-              colors[MathUtils.nextInt(0, colors.length - 1)] +
-              "PREPARING GAME",
-              100
-            );
+            String[] lines = getScoreboardLines(user).toArray(new String[0]);
+
+            user.sendScoreboard("", lines);
           }
         );
+      onGameUpdate();
+    } else {
+      broadcastScoreboard(
+        "",
+        player -> getNeutralPlayers().contains(player),
+        "\uE181 " + order + "/" + game.getMicroGamesCount(),
+        "\uE105 " + countNeutralPlayers()
+      );
     }
   }
 
@@ -263,6 +271,7 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
         Map<Player, Integer> pedestalWinners = new HashMap<>();
         pedestalWinners.put(winner, 1);
 
+        cleanupNeutralPlayers();
         game.end(pedestalWinners);
 
         return;
@@ -272,6 +281,7 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
         "&c&l» &r&cBad news... There were no winners in this game!"
       );
 
+      cleanupNeutralPlayers();
       game.end(null);
 
       return;
@@ -280,9 +290,12 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
     if (countNeutralPlayers() == roundWinners.size()) {
       if (order == game.getMicroGamesCount()) {
         broadcastMessage("&c&l» &r&cBad news... There was a tie!");
+        cleanupNeutralPlayers();
         game.end(null);
       } else {
         broadcastMessage("&a&l» &rAll players won this round!");
+        broadcastSound("random.levelup", 1, 3);
+        cleanupNeutralPlayers();
       }
     } else {
       getRoundLosers()
@@ -301,6 +314,8 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
         );
     }
 
+    cleanupNeutralPlayers();
+
     roundWinners.clear();
 
     onGameEnd();
@@ -310,6 +325,17 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
     if (mainMap != null) {
       getOnlinePlayers().forEach(mainMap::teleportToSafeSpawn);
     }
+  }
+
+  private void cleanupNeutralPlayers() {
+    getNeutralUsers()
+      .forEach(
+        user -> {
+          user.giveDefaultAttributes();
+          user.removeScoreboard();
+          user.removeBossBar();
+        }
+      );
   }
 
   public abstract String getName();
@@ -335,9 +361,12 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
 
     user.giveDefaultAttributes();
 
-    player.sendTitle(
-      TextFormat.colorize("&bYou won this game!"),
-      TextFormat.WHITE + "You will continue in the next game."
+    LocalStorage localStorage = user.getLocalStorage();
+
+    localStorage.set("rounds_won", localStorage.getInteger("rounds_won") + 1);
+
+    broadcastMessage(
+      "&l&b» &r&fPlayer &b" + player.getName() + "&f won this game!"
     );
 
     playSound(player, "random.levelup", 2, 3);
