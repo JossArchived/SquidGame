@@ -72,6 +72,7 @@ public class Hopscotch extends Microgame {
         VectorUtils.stringToVector(goalSection.getString("cornerOne")),
         VectorUtils.stringToVector(goalSection.getString("cornerTwo"))
       );
+    game.getGameMapManager().addMap(map);
   }
 
   @Override

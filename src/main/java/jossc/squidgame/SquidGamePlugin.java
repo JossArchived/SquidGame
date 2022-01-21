@@ -71,7 +71,7 @@ public class SquidGamePlugin extends Game implements Teamable {
 
     phaseSeries.addAll(lobbyPhases);
     phaseSeries.add(new RedLightGreenLight(Duration.ofMinutes(5)));
-    phaseSeries.add(new SugarHoneycombs(Duration.ofMinutes(1)));
+    phaseSeries.add(new SugarHoneycombs(Duration.ofMinutes(2)));
     phaseSeries.add(new NightAmbush(Duration.ofMinutes(2)));
     phaseSeries.add(new TugOfWar(Duration.ofMinutes(4)));
     phaseSeries.add(new Marbles(Duration.ofMinutes(5)));

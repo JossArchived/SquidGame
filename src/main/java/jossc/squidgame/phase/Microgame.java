@@ -55,7 +55,7 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
 
   @Override
   protected void onStart() {
-    cleanupNeutralPlayers();
+    //cleanupNeutralPlayers();
 
     String instruction = getInstruction();
 
@@ -67,7 +67,7 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
 
         broadcastMessage("&d&l» &e#" + order + "&b " + getName());
         broadcastMessage("&l&7» &r" + instruction);
-        cleanupNeutralPlayers();
+        //cleanupNeutralPlayers();
       },
       20 * 4
     );
@@ -194,7 +194,7 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
           reamingDurationToSeconds +
           "&f!"
         );
-        broadcastSound("liquid.lavapop", 0.9f, 1);
+        broadcastSound("liquid.lavapop", 0.9f, 3);
       }
       getNeutralUsers()
         .forEach(
@@ -271,7 +271,7 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
         Map<Player, Integer> pedestalWinners = new HashMap<>();
         pedestalWinners.put(winner, 1);
 
-        cleanupNeutralPlayers();
+        //cleanupNeutralPlayers();
         game.end(pedestalWinners);
 
         return;
@@ -281,7 +281,7 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
         "&c&l» &r&cBad news... There were no winners in this game!"
       );
 
-      cleanupNeutralPlayers();
+      //cleanupNeutralPlayers();
       game.end(null);
 
       return;
@@ -290,12 +290,12 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
     if (countNeutralPlayers() == roundWinners.size()) {
       if (order == game.getMicroGamesCount()) {
         broadcastMessage("&c&l» &r&cBad news... There was a tie!");
-        cleanupNeutralPlayers();
+        //cleanupNeutralPlayers();
         game.end(null);
       } else {
         broadcastMessage("&a&l» &rAll players won this round!");
         broadcastSound("random.levelup", 1, 3);
-        cleanupNeutralPlayers();
+        //cleanupNeutralPlayers();
       }
     } else {
       getRoundLosers()
@@ -314,7 +314,7 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
         );
     }
 
-    cleanupNeutralPlayers();
+    //cleanupNeutralPlayers();
 
     roundWinners.clear();
 
@@ -327,7 +327,7 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
     }
   }
 
-  private void cleanupNeutralPlayers() {
+  /*private void cleanupNeutralPlayers() {
     getNeutralUsers()
       .forEach(
         user -> {
@@ -336,7 +336,7 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
           user.removeBossBar();
         }
       );
-  }
+  }*/
 
   public abstract String getName();
 

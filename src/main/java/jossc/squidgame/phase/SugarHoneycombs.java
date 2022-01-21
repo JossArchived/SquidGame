@@ -18,7 +18,6 @@ import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
-import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
