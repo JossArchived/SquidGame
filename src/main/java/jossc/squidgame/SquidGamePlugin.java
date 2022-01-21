@@ -180,7 +180,9 @@ public class SquidGamePlugin extends Game implements Teamable {
 
     FormAPI
       .modalWindowForm(
-        TextFormat.BOLD.toString() + TextFormat.DARK_PURPLE + "            Game Over!",
+        TextFormat.BOLD.toString() +
+        TextFormat.DARK_PURPLE +
+        "            Game Over!",
         TextFormat.colorize(
           "&f&lYour game overview:\n\n   &b&l» &r&b" +
           roundsWon +
