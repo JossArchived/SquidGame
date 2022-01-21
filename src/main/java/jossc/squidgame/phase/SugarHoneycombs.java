@@ -185,7 +185,7 @@ public class SugarHoneycombs extends Microgame {
   }
 
   private void applyDamage(Player player) {
-    player.attack(1.5f);
+    player.attack(2f);
   }
 
   @Override
