@@ -42,15 +42,17 @@ public class Hopscotch extends Microgame {
   public void setupMap(Config config) {
     ConfigSection section = config.getSection("maps.hopscotchMap");
     ConfigSection goalSection = section.getSection("goal");
-    ConfigSection crystalsSection = section.getSection("crystal");
+    ConfigSection crystalsSectionConfig = section.getSection("crystal");
 
-    int crystalSectionsNumber = crystalsSection.getInt("number");
+    int numberOfCrystalSections = crystalsSectionConfig.getInt("number");
 
     List<CrystalSection> crystalSections = new ArrayList<>();
 
-    for (int i = 1; i <= crystalSectionsNumber; i++) {
+    for (int i = 1; i <= numberOfCrystalSections; i++) {
       List<Vector3> crystals = VectorUtils.stringListToVectorList(
-        crystalsSection.getSection("sections").getStringList(String.valueOf(i))
+        crystalsSectionConfig
+          .getSection("sections")
+          .getStringList(String.valueOf(i))
       );
       boolean randomBoolean = new Random().nextBoolean();
 
@@ -102,7 +104,11 @@ public class Hopscotch extends Microgame {
 
     if (
       ((HopscotchMap) map).isFakeCrystal(
-          blockBelow.asBlockVector3().asVector3().round()
+          new Vector3(
+            blockBelow.getFloorX(),
+            blockBelow.getFloorY(),
+            blockBelow.getFloorZ()
+          )
         )
     ) {
       player.getLevel().setBlock(blockBelow, new BlockAir(), false, true);

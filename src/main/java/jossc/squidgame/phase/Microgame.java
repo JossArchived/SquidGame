@@ -267,10 +267,13 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
           " is the winner, congrats!"
         );
 
-        Map<Player, Integer> pedestalWinners = new HashMap<>();
-        pedestalWinners.put(winner, 1);
-
-        game.end(pedestalWinners);
+        game.end(
+          new HashMap<Player, Integer>() {
+            {
+              put(winner, 1);
+            }
+          }
+        );
 
         return;
       }
@@ -317,6 +320,7 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
 
     if (mainMap != null) {
       getOnlinePlayers().forEach(mainMap::teleportToSafeSpawn);
+      getNeutralUsers().forEach(User::giveDefaultAttributes);
     }
   }
 

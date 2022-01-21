@@ -1,7 +1,9 @@
 package jossc.squidgame.map;
 
 import cn.nukkit.math.Vector3;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import jossc.squidgame.map.feature.crystal.Crystal;
 import jossc.squidgame.map.feature.crystal.CrystalSection;
 import lombok.Getter;
@@ -16,6 +18,7 @@ public class HopscotchMap extends GameMap {
   private final List<CrystalSection> crystalSections;
   private final Vector3 goalCornerOne;
   private final Vector3 goalCornerTwo;
+  private final List<Vector3> fakeCrystals = new ArrayList<>();
 
   public HopscotchMap(
     Game game,
@@ -29,6 +32,22 @@ public class HopscotchMap extends GameMap {
     this.crystalSections = crystalSections;
     this.goalCornerOne = goalCornerOne;
     this.goalCornerTwo = goalCornerTwo;
+
+    crystalSections.forEach(
+      crystalSection ->
+        fakeCrystals.add(
+          Objects
+            .requireNonNull(
+              crystalSection
+                .getCrystals()
+                .stream()
+                .filter(Crystal::isFake)
+                .findFirst()
+                .orElse(null)
+            )
+            .getPosition()
+        )
+    );
   }
 
   public boolean isTheGoal(Vector3 vector3) {
@@ -51,18 +70,6 @@ public class HopscotchMap extends GameMap {
   }
 
   public boolean isFakeCrystal(Vector3 position) {
-    for (CrystalSection crystalSection : crystalSections) {
-      Crystal firstCrystal = crystalSection.getFirstCrystal();
-      Crystal secondCrystal = crystalSection.getSecondCrystal();
-
-      return (
-        firstCrystal.getPosition().equals(position) &&
-        firstCrystal.isFake() ||
-        secondCrystal.getPosition().equals(position) &&
-        secondCrystal.isFake()
-      );
-    }
-
-    return true;
+    return fakeCrystals.contains(position);
   }
 }

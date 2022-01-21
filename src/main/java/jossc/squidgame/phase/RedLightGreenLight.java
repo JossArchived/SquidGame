@@ -8,7 +8,9 @@ import cn.nukkit.level.Position;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
+import cn.nukkit.utils.TextFormat;
 import java.time.Duration;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import jossc.squidgame.map.RedLightGreenLightMap;
@@ -57,6 +59,19 @@ public class RedLightGreenLight extends Microgame {
   }
 
   @Override
+  public List<String> getScoreboardLines(User user) {
+    List<String> lines = super.getScoreboardLines(user);
+
+    lines.add(
+      canWalk
+        ? "⨂ " + TextFormat.GREEN + "Green Light"
+        : "⨀ " + TextFormat.RED + "Red Light"
+    );
+
+    return lines;
+  }
+
+  @Override
   public void onGameStart() {
     spawnDoll();
     singDoll();
@@ -83,7 +98,7 @@ public class RedLightGreenLight extends Microgame {
     doll.setScale(3.5f);
     doll.lookAt(map.getSafeSpawn());
 
-    game.getCitizenLibrary().getFactory().add(doll);
+    game.getCitizenLibrary().getCitizenFactory().add(doll);
   }
 
   private void spawnDoll() {

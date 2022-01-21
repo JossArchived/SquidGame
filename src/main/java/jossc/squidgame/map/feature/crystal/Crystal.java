@@ -13,4 +13,9 @@ public class Crystal {
     this.position = position;
     this.fake = fake;
   }
+
+  @Override
+  public String toString() {
+    return "Crystal{" + "position=" + position + ", fake=" + fake + '}';
+  }
 }
