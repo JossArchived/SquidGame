@@ -10,6 +10,7 @@ import cn.nukkit.utils.Config;
 import cn.nukkit.utils.ConfigSection;
 import java.time.Duration;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import jossc.squidgame.map.RedLightGreenLightMap;
 import lombok.Getter;
 import net.josscoder.gameapi.user.User;
@@ -201,6 +202,10 @@ public class RedLightGreenLight extends Microgame {
   }
 
   private void despairDoll() {
-    getOnlinePlayers().forEach(player -> doll.despairFrom(player));
+    getOnlinePlayers()
+      .stream()
+      .filter(player -> doll.getViewers().contains(player))
+      .collect(Collectors.toList())
+      .forEach(player -> doll.despairFrom(player));
   }
 }

@@ -104,7 +104,7 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
               )
         );
     } else {
-      if (map.getSpawns().isEmpty()) {
+      if (map.getSpawns(GameMap.SOLO).isEmpty()) {
         getOnlinePlayers()
           .forEach(
             player -> {
@@ -113,7 +113,7 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
             }
           );
       } else {
-        List<Vector3> spawns = map.getSpawns();
+        List<Vector3> spawns = map.getSpawns(GameMap.SOLO);
         Set<Integer> spawnsUsed = new HashSet<>();
 
         getNeutralPlayers()
@@ -241,6 +241,8 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
     Vector3 spawn = spawns.get(i);
 
     player.setImmobile();
+
+    map.prepare();
 
     player.teleport(Position.fromObject(spawn, map.toLevel()));
 

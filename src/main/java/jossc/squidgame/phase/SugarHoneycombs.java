@@ -74,7 +74,7 @@ public class SugarHoneycombs extends Microgame {
       spawns.add(VectorUtils.stringToVector(section.getString("spawns." + i)));
     }
 
-    map.setSpawns(spawns);
+    map.setSpawns(GameMap.SOLO, spawns);
     game.getGameMapManager().addMap(map);
   }
 

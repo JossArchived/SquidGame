@@ -1,5 +1,6 @@
 package jossc.squidgame.map;
 
+import cn.nukkit.Player;
 import cn.nukkit.math.Vector3;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,5 +46,10 @@ public class RedLightGreenLightMap extends GameMap {
       minZ <= vector3.z &&
       maxZ >= vector3.z
     );
+  }
+
+  @Override
+  public void teleportToSafeSpawn(Player player) {
+    super.teleportToSafeSpawn(player);
   }
 }
