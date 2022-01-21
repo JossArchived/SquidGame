@@ -55,8 +55,6 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
 
   @Override
   protected void onStart() {
-    //cleanupNeutralPlayers();
-
     String instruction = getInstruction();
 
     schedule(
@@ -67,7 +65,6 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
 
         broadcastMessage("&d&l» &e#" + order + "&b " + getName());
         broadcastMessage("&l&7» &r" + instruction);
-        //cleanupNeutralPlayers();
       },
       20 * 4
     );
@@ -273,7 +270,6 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
         Map<Player, Integer> pedestalWinners = new HashMap<>();
         pedestalWinners.put(winner, 1);
 
-        //cleanupNeutralPlayers();
         game.end(pedestalWinners);
 
         return;
@@ -283,7 +279,6 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
         "&c&l» &r&cBad news... There were no winners in this game!"
       );
 
-      //cleanupNeutralPlayers();
       game.end(null);
 
       return;
@@ -292,12 +287,10 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
     if (countNeutralPlayers() == roundWinners.size()) {
       if (order == game.getMicroGamesCount()) {
         broadcastMessage("&c&l» &r&cBad news... There was a tie!");
-        //cleanupNeutralPlayers();
         game.end(null);
       } else {
         broadcastMessage("&a&l» &rAll players won this round!");
         broadcastSound("random.levelup", 1, 3);
-        //cleanupNeutralPlayers();
       }
     } else {
       getRoundLosers()
@@ -316,8 +309,6 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
         );
     }
 
-    //cleanupNeutralPlayers();
-
     roundWinners.clear();
 
     onGameEnd();
@@ -328,17 +319,6 @@ public abstract class Microgame extends GamePhase<SquidGamePlugin> {
       getOnlinePlayers().forEach(mainMap::teleportToSafeSpawn);
     }
   }
-
-  /*private void cleanupNeutralPlayers() {
-    getNeutralUsers()
-      .forEach(
-        user -> {
-          user.giveDefaultAttributes();
-          user.removeScoreboard();
-          user.removeBossBar();
-        }
-      );
-  }*/
 
   public abstract String getName();
 

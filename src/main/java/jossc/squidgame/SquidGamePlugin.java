@@ -184,7 +184,7 @@ public class SquidGamePlugin extends Game implements Teamable {
         TextFormat.DARK_PURPLE +
         "            Game Over!",
         TextFormat.colorize(
-          "&f&lYour game overview:\n\n   &b&l» &r&b" +
+          "&f&lYour game overview:\n\n  &b&l» &r&b" +
           roundsWon +
           " Rounds Won\n   &b&l» &r&b" +
           blocksBroken +

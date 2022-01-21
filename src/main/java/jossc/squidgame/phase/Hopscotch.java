@@ -106,6 +106,7 @@ public class Hopscotch extends Microgame {
         )
     ) {
       player.getLevel().setBlock(blockBelow, new BlockAir(), false, true);
+      broadcastSound("random.glass");
     }
   }
 

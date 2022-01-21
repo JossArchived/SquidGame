@@ -104,13 +104,9 @@ public class RedLightGreenLight extends Microgame {
     broadcastSound("mob.ghast.moan", condition);
 
     if (doll != null) {
-      Vector3 newVector = doll
-        .getPosition()
-        .subtract(map.getSafeSpawn())
-        .asVector3f()
-        .asVector3();
-
-      doll.lookAt(newVector);
+      doll.lookAt(map.getSafeSpawn());
+      doll.setYaw(doll.getYaw() - 180);
+      doll.updateCurrentPosition();
     }
 
     giveGreenWool();
