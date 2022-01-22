@@ -35,7 +35,7 @@ public class Hopscotch extends Microgame {
 
   @Override
   public String getInstruction() {
-    return "In this game you have to reach the goal, remember that there are tempered crystals through which you can walk... the rest are fake.";
+    return "In this game you have to reach the goal, remember that there are tempered crystals through which you can walk... the rest are fake";
   }
 
   @Override
