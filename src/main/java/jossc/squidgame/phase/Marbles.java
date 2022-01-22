@@ -91,7 +91,7 @@ public class Marbles extends Microgame {
 
     storage.set("marbles", storage.getInteger("marbles") - 1);
 
-    user.sendMessage("&l&c» -1 point");
+    user.sendMessage("&l&c» -1 marble");
 
     if (storage.getInteger("marbles") <= 0) {
       lose(user.getPlayer());
@@ -105,7 +105,7 @@ public class Marbles extends Microgame {
 
     storage.set("marbles", storage.getInteger("marbles") + 2);
 
-    user.sendMessage("&l&a» +2 points");
+    user.sendMessage("&l&a» +2 marbles");
 
     if (storage.getInteger("marbles") >= 20) {
       win(user.getPlayer());

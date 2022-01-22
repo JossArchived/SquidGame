@@ -84,7 +84,7 @@ public class SugarHoneycombs extends Microgame {
 
     int blocksBroken = user.getLocalStorage().getInteger("blocks_broken");
 
-    lines.add("\uE19D Blocks broken " + blocksBroken);
+    lines.add("\uE19D Blocks Broken " + blocksBroken);
 
     return lines;
   }
@@ -169,7 +169,7 @@ public class SugarHoneycombs extends Microgame {
 
           storage.set("blocks_broken", storage.getInteger("blocks_broken") + 1);
 
-          user.sendMessage("&l&a» +1 point");
+          user.sendMessage("&l&a» +1 block broken");
 
           if (storage.getInteger("blocks_broken") >= 5) {
             win(player);
