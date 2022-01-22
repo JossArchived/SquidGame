@@ -54,7 +54,7 @@ public class SugarHoneycombs extends Microgame {
 
   @Override
   public String getInstruction() {
-    return "You will have to cut the figure to perfection before the game ends, remember that if you miss a block, your life will decrease";
+    return "Break 10 blocks with the Burning Needle to win!";
   }
 
   @Override
@@ -84,21 +84,22 @@ public class SugarHoneycombs extends Microgame {
 
     int blocksBroken = user.getLocalStorage().getInteger("blocks_broken");
 
-    lines.add("\uE19D Blocks Broken " + blocksBroken);
+    lines.add("\uE19D Blocks Broken " + blocksBroken + "/10");
 
     return lines;
   }
 
   @Override
   public void onGameStart() {
-    giveBurningNeedle();
+    giveAttributes();
     canReciveDamage = true;
   }
 
-  private void giveBurningNeedle() {
+  private void giveAttributes() {
     getNeutralPlayers()
       .forEach(
         player -> {
+          player.setImmobile();
           player.getInventory().setItem(0, burningNeedle.build());
           player.getInventory().setItem(9, new ItemArrow());
 
@@ -171,7 +172,7 @@ public class SugarHoneycombs extends Microgame {
 
           user.sendMessage("&l&a» +1 block broken");
 
-          if (storage.getInteger("blocks_broken") >= 5) {
+          if (storage.getInteger("blocks_broken") >= 10) {
             win(player);
           }
         }
@@ -185,7 +186,7 @@ public class SugarHoneycombs extends Microgame {
   }
 
   private void applyDamage(Player player) {
-    player.attack(2f);
+    player.attack(4.0f);
   }
 
   @Override
