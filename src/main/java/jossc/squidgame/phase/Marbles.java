@@ -61,7 +61,7 @@ public class Marbles extends Microgame {
     List<String> lines = super.getScoreboardLines(user);
 
     int marbles = user.getLocalStorage().getInteger("marbles");
-    lines.add("\uE14E " + marbles);
+    lines.add("\uE14E Marbles " + marbles + "/20");
 
     return lines;
   }

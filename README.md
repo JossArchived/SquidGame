@@ -1,4 +1,4 @@
-<img height="300" src="https://i.imgur.com/odwLWJV.png" width="1000" alt=""/>
+<img height="300" src="https://i.imgur.com/odwLWJV.png" width="600" alt=""/>
 
 ## 🤔 What is this?
 
@@ -53,6 +53,112 @@ In total there are 7 games, as in the official series:
 To observe in a better way, here is a video with the finished game:
 
 [![Watch the video](https://i.imgur.com/w8D2Ty1.png)](https://youtu.be/Rr-WE7pSW_k)
+
+## 🔨 Installation & Setup
+
+- First, download the latest version [here](https://github.com/Josscoder/SquidGame/releases/latest)
+- Second, go to the plugins folder of your server and put the previously downloaded file inside.
+- Third, restart your server and you can start configuring,
+
+```yml
+developmentMode: false #when this is false, the game itself will not work, only developer settings, play sounds and get position are enabled
+maxPlayers: 5
+minPlayers: 2
+maps: # These are all the maps we use
+  waitingRoomMap:
+    name: world # This will be the name of the world that will be the waiting room
+    safeSpawn: 119:14:130 # This will be the center or the place where you always appear
+    exitEntitySpawn: 122:12:132 # This is the position where the exit entity to the lobby will be
+    pedestalCenterSpawn: 147:11:129 # This will be the position where you appear in the final stage, when the winner is on the pedestal
+    pedestalOneSpawn: 156:14:129
+    pedestalTwoSpawn: 156:13:133
+    pedestalThreeSpawn: 156:12:125
+  roomMap:
+    name: SquidGameRoom
+    safeSpawn: 0:101:0
+  greenLightRedLightMap:
+    name: RedLightGreenLight
+    safeSpawn: 128:6:103
+    goalCornerOne: 148:5:149
+    goalCornerTwo: 108:25:158
+    dollPosition: 128:6:152 # This will be the position in which the doll appears in the game red light green light
+  sugarHoneycombsMap:
+    name: SugarHoneyCombs
+    safeSpawn: 128:4:128
+    spawns: # These are the positions of all the rooms where the players appear to break the blocks
+      '1': 323:4:152
+      '2': 323:4:109
+      '3': 286:4:109
+      '4': 286:4:152
+      '5': 304:4:130
+  tugOfWarMap:
+    name: TugOfWar
+    safeSpawn: 128:4:128
+    red:
+      spawns: # These are the positions where the players appear in the game of Tug of War
+        '1': 128:17:130
+        '2': 129:17:130
+        '3': 130:17:130
+        '4': 127:17:130
+        '5': 126:17:130
+    blue:
+      spawns:
+        '1': 128:17:125
+        '2': 129:17:125
+        '3': 130:17:125
+        '4': 127:17:125
+        '5': 126:17:125
+  marblesMap:
+    name: Marbles
+    safeSpawn: 128:5:128
+    odd: # This will be the place where the player will stop to say that the number is odd, for this you have to get the upper corner and then the side corner at the bottom, covering the entire area
+      cornerOne: 130:4:132
+      cornerTwo: 126:9:136
+    pair:
+      cornerOne: 130:4:124
+      cornerTwo: 126:9:120
+  hopscotchMap:
+    name: Hopscotch
+    safeSpawn: 128:16:152
+    crystal:
+      number: 10 # This is the number of glass sections the map will have
+      sections:
+        '1':
+          - 127:15:147 # This is the position of the first crystal
+          - 129:15:147 # This is the position of the second crystal
+        '2':
+          - 127:15:143
+          - 129:15:143
+        '3':
+          - 127:15:139
+          - 129:15:139
+        '4':
+          - 127:15:135
+          - 129:15:135
+        '5':
+          - 127:15:131
+          - 129:15:131
+        '6':
+          - 127:15:127
+          - 129:15:127
+        '7':
+          - 127:15:123
+          - 129:15:123
+        '8':
+          - 127:15:119
+          - 129:15:119
+        '9':
+          - 127:15:115
+          - 129:15:115
+        '10':
+          - 127:15:111
+          - 129:15:111
+    goal: # This is the position of the goal, it is recorded just like the game of marbles
+      cornerOne: 134:13:108
+      cornerTwo: 120:23:100
+```
+
+If you have any questions, contact me through my discord Josscoder#9867 or on my [Twitter](https://twitter.com/Josscoder)
 
 ## 📜 LICENSE
 

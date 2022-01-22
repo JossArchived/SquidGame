@@ -98,7 +98,7 @@ public class SquidGamePlugin extends Game implements Teamable {
     saveDefaultConfig();
 
     setDevelopmentMode(getConfig().getBoolean("developmentMode"));
-    setDefaultPlayerGamemode(getConfig().getInt("defaultGamemode"));
+    setDefaultPlayerGamemode(Player.SURVIVAL);
     setMaxPlayers(getConfig().getInt("maxPlayers"));
     setMinPlayers(getConfig().getInt("minPlayers"));
 
