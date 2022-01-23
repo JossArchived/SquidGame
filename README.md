@@ -1,4 +1,6 @@
-<img height="300" src="https://i.imgur.com/odwLWJV.png" width="600" alt=""/>
+<p align="center">
+  <img height="300" src="https://i.imgur.com/odwLWJV.png" width="600" alt=""/>
+</p>
 
 ## 🤔 What is this?
 
