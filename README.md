@@ -164,4 +164,4 @@ If you have any questions, contact me through my discord Josscoder#9867 or on my
 
 ## 📜 LICENSE
 
-This game is licensed under the [Apache License 2.0](https://github.com/Josscoder/SquidGame/blob/main/LICENSE), this game was completely created by Josscoder (Luciano Mejia)
+This game is licensed under the [Apache License 2.0](https://github.com/Josscoder/SquidGame/blob/main/LICENSE), this game was completely created by Josscoder (José Luciano Mejia Arias)
