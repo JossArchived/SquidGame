@@ -162,6 +162,10 @@ maps: # These are all the maps we use
 
 If you have any questions, contact me through my discord Josscoder#9867 or on my [Twitter](https://twitter.com/Josscoder)
 
+## Maps
+
+https://www.mediafire.com/folder/zcn1r1k05fhfl/squidgame-maps
+
 ## 📜 LICENSE
 
 This game is licensed under the [Apache License 2.0](https://github.com/Josscoder/SquidGame/blob/main/LICENSE), this game was completely created by Josscoder (José Luciano Mejia Arias)
